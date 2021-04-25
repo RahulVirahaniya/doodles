@@ -1,0 +1,47 @@
+body{
+  display: flex;
+  flex-direction: row;
+  background-color: #00bb77;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpolygon fill='%23000' fill-opacity='.1' points='120 0 120 60 90 30 60 0 0 0 0 0 60 60 0 120 60 120 90 90 120 60 120 0'/%3E%3C/svg%3E");
+}
+aside{
+  display: flex;
+  justify-content: center;
+  width: 30%;
+}
+main{
+  display: flex;
+  justify-content: flex-end;
+  width: 70%;
+}
+canvas{
+  background-color: #fff;
+}
+.chatBox{
+  width: 80%;
+  height: 600px;
+  background-color: #EEEEEE;
+  display: flex;
+  flex-direction: column;
+}
+.boxMessage{
+  height:560px;
+  overflow-y: auto;
+}
+.form-control{
+  width: 97%;
+  margin-left:5.5px;
+  font-size: 14px;
+}
+.form-control::placeholder{
+  font-weight: 500;
+  color:#cccccc !important;
+}
+.message{
+  margin-left: 5px;
+  border-radius: 2px;
+  padding-left: 2px;
+}
+.light{
+  background-color: #fff;
+}
