@@ -10,23 +10,38 @@ app.get('/',(req,res) =>{
 const users={};
 io.on('connection', socket =>{
   socket.on('new-user-joined', name =>{
+    const ID=socket.id;
     users[socket.id]=name;
     socket.broadcast.emit('user-joined', name);
+    updateClients(ID);
   });
   socket.on('send', message =>{
     socket.broadcast.emit('recieve', {name: users[socket.id], message: message});
   });
   socket.on('disconnect', message =>{
+    const ID=socket.id;
     socket.broadcast.emit('left', users[socket.id]);
     delete users[socket.id];
+    updateClients(ID);
   });
-  socket.on('mouse', mouseMessage);
-  function mouseMessage(data){
-    socket.broadcast.emit('mouse',data);
-  }
-  socket.on('mouseup', mouseUpMessage);
-  function mouseUpMessage(data) {
-    socket.broadcast.emit('mouseup', data);
+  socket.on('mouse', (data)=>{
+    socket.broadcast.emit('mouse', data);
+  });
+  socket.on('mouseup',()=>{
+    socket.broadcast.emit('mouseup');
+  });
+  socket.on('fill', (img)=>{
+    socket.broadcast.emit('fill', img);
+  });
+  socket.on('clear', ()=>{
+    socket.broadcast.emit('clear');
+  });
+  function updateClients(ID) {
+    const data={
+      id: ID,
+      users: users
+    }
+    io.sockets.emit('update', data);
   }
 });
 const PORT = 3000 || process.env.PORT;

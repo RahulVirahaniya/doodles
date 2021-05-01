@@ -9,19 +9,93 @@
 </head>
 
 <body>
+  <div id="containerPlayerList">
+    <div id="containerGamePlayers">
+      <!-- <div class="player" id="player112">
+        <div class="rank">#3</div>
+        <div class="info">
+          <div class="name">rosyyy</div>
+          <div class="score">Points: 0</div>
+        </div> -->
+        <!-- <div class="avatar"><div class="color" style="background-size: 480px 480px; background-position: -336px -48px;"></div>
+        <div class="eyes" style="background-size: 480px 480px; background-position: -288px 0px;"></div>
+        <div class="mouth" style="background-size: 480px 480px; background-position: -432px -48px;"></div>
+        <div class="special" style="display: none;"></div>
+        <div class="owner" style="display: none;"></div>
+        <div class="drawing" style="display: none;"></div> -->
+      <!-- </div> -->
+      <!-- <div class="message" style="display: none">
+        <div class="arrow"></div>
+        <div class="content">
+          <div class="text"></div>
+          <div class="iconThumbsUp"></div>
+          <div class="iconThumbsDown"></div>
+        </div>
+      </div> -->
+    </div>
+    <div class="tooltip-wrapper" style="margin-top:8px" data-toggle="tooltip" data-placement="top" title="" data-original-title="Votekick the current player if they are misbehaving">
+      <button class="btn btn-warning btn-block" id="votekickCurrentplayer">Votekick</button>
+    </div>
+  </div>
   <main>
-    <canvas id="canvas" height="600" width="750"></canvas>
-  </main>
-  <aside>
-    <div class="chatBox">
-      <div class="boxMessage"></div>
-      <div class="send">
-        <form action="#" id="send-message">
-          <input class="form-control" id="inputChat" type="text" name="inputChat" placeholder="Type your guess here..." autocomplete="off">
-        </form>
+    <div class="containerCanvas">
+      <canvas id="canvas" height="600" width="800"></canvas>
+    </div>
+    <div class="containerToolbar">
+      <div class="colorPreview" data-toggle="tooltip" data-placement="top" title="" style="background-color: rgb(0, 0, 0);" data-original-title="Color preview"></div>
+      <div class="containerColorbox" data-toggle="tooltip" data-placement="top" title="" data-original-title="Select a color">
+        <div class="containerColorColumn">
+          <div onclick="change_color(this)" class="colorItem" data-color="0" style="background: #FFF"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="2" style="background: #C1C1C1"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="4" style="background: #EF130B"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="6" style="background: #FF7100"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="8" style="background: #FFE400"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="10" style="background: #00CC00"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="12" style="background: #00B2FF"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="14" style="background: #231FD3"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="16" style="background: #A300BA"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="18" style="background: #D37CAA"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="20" style="background: #A0522D"></div>
+        </div>
+        <div class="containerColorColumn">
+          <div onclick="change_color(this)"class="colorItem" data-color="1" style="background: #000"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="3" style="background: #4C4C4C"></div>
+          <div onclick="change_color(this)"class="colorItem" data-color="5" style="background: #740B07"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="7" style="background: #C23800"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="9" style="background: #E8A200"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="11" style="background: #005510"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="13" style="background: #00569E"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="15" style="background: #0E0865"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="17" style="background: #550069"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="19" style="background: #A75574"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="21" style="background: #63300D"></div>
+        </div>
+      </div>
+      <input onchange="colorPicker()" type="color" id="colorPicker" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit color">
+      <div class="containerTools">
+        <div onclick="pencil()" class="tool toolActive" data-tool="pen"><img class="toolIcon" src="images/pen.gif" data-toggle="tooltip" data-placement="top" title="" data-original-title="(P)en"></div>
+        <div onclick="eraser()" class="tool" data-tool="erase"><img class="toolIcon" src="images/rubber.gif" data-toggle="tooltip" data-placement="top" title="" data-original-title="(E)raser"></div>
+        <div onclick="fill_canvas()" class="tool" data-tool="fill"><img class="toolIcon" src="images/filltool.gif" data-toggle="tooltip" data-placement="top" title="" data-original-title="(F)ill"></div>
+      </div>
+      <div class="containerBrushSizes" data-toggle="tooltip" data-placement="top" title="" data-original-title="Set brush size">
+        <input onclick="myRange()" id="myRange" type="range" min="1" max="50" value="6">
+      </div>
+      <div class="containerClearCanvas">
+        <div onclick="clear_canvas()" id="buttonClearCanvas" data-toggle="tooltip" data-placement="top" title="" data-original-title="Clear the board"></div>
       </div>
     </div>
+  </main>
+  <aside>
+    <div class="boxMessage"></div>
+    <div class="send">
+      <form action="#" id="send-message">
+        <input class="form-control" id="inputChat" type="text" name="inputChat" placeholder="Write your message here..." autocomplete="off">
+      </form>
+    </div>
   </aside>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF" crossorigin="anonymous"></script>
   <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
   <script src="Js/sketch.js" charset="utf-8"></script>
 </body>
