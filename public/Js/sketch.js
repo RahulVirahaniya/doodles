@@ -48,28 +48,16 @@ form.addEventListener('submit', (e)=>{
     inputChat.value="";
     return;
   }
-  // showing your sent message
   const name="You: ";
   append(`${name}`, `${message}`, 'right', '');
   scrollToBottom();
   socket.emit('send', message);
   inputChat.value="";
 });
-
-// popup for adding a new user
-
 let name;
-do{
-  name=prompt("Enter your name to join");
-} while(!name || name.replace(/\s/g,'').length===0)
-name=name.charAt(0).toUpperCase() + name.slice(1);
-socket.emit('new-user-joined', name);
-
-
-//  new user joins
-
 socket.on('user-joined', name =>{
-  append(`${name}`, " joined the chat", 'left', 'join');
+  name=name.charAt(0).toUpperCase() + name.slice(1);
+  append(`${name}`, " joined the chat", 'left', 'green');
   scrollToBottom();
 });
 
@@ -78,8 +66,7 @@ socket.on('user-joined', name =>{
 let curUserId = 0;
 socket.on('userId', data =>{
   curUserId = data;
-})
-
+});
 // adding players to the score list
 
 const appendPlayers = (rank, key, name, ID, score) => {
@@ -99,7 +86,7 @@ const appendPlayers = (rank, key, name, ID, score) => {
   players.appendChild(info);
   const playername=document.createElement('div');
   playername.classList.add('name');
-  if(key==ID){
+  if(key===ID){
     playername.classList.add('myName');
     playername.innerText=name+" (You)";
   }else {
@@ -114,10 +101,10 @@ const appendPlayers = (rank, key, name, ID, score) => {
 
 // appneding players to the players list
 
-socket.on('update', function (data){
+socket.on('update', function (users){
   $('#containerGamePlayers').empty();
-  for (let [key, value] of Object.entries(data.users)) {
-    appendPlayers("#1", `${key}`, `${value}`, `${data.id}`, "Points: 10");
+  for (let [key, value] of Object.entries(users)) {
+    appendPlayers("#1", `${key}`, `${value}`, curUserId, "Points: 10");
   }
 });
 
@@ -132,7 +119,7 @@ socket.on('recieve', data =>{
   }
   else
   {
-    append(`${data.name}: `,"guessed the answer" , 'left', '');
+    append(`${data.name}: `,"guessed the answer" , 'left', 'green');
     scrollToBottom();
   }
 });
@@ -140,7 +127,7 @@ socket.on('recieve', data =>{
 // when a player leaves
 
 socket.on('left', data=>{
-  append(`${data.name}`, " left the chat", 'left', 'leave');
+  append(`${data.name}`, " left the chat", 'left', 'red');
   scrollToBottom();
 });
 
@@ -152,13 +139,13 @@ function scrollToBottom(){
 
 socket.on('toAll' , data =>{
   console.log(data);
-})
+});
 
 
 let accessId ;
 socket.on('restrictAccess', id =>{
   clearTheBoard();
-  console.log(id.id);
+  //console.log(id.id);
   accessId = id.id;
   const toolbar = document.getElementById('toolbar');
   // giving access to the user
@@ -464,8 +451,13 @@ let painting=false;
   function clearTheBoard(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
   }
+  canvas.addEventListener("touchstart",startPosition);
   canvas.addEventListener("mousedown",startPosition);
+
+  canvas.addEventListener("touchend",finishedPosition);
   canvas.addEventListener("mouseup",finishedPosition);
-  canvas.addEventListener("mousemove",draw);
   canvas.addEventListener('mouseout',finishedPosition);
+
+  canvas.addEventListener("touchmove",draw);
+  canvas.addEventListener("mousemove",draw);
 // }

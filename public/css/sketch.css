@@ -178,11 +178,11 @@ aside{
   background-color: #fff;
   float: right;
 }
-.join{
+.green{
   font-weight: 500;
   color: rgb(86, 206, 39);
 }
-.leave{
+.red{
   font-weight: 500;
   color: rgb(206, 79, 10);
 }

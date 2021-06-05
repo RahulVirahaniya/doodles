@@ -1,11 +1,19 @@
 const express=require('express');
+const bodyParser = require('body-parser');
 const app=express();
 const server=require('http').createServer(app);
 const io=require('socket.io')(server, {cors: {origin: "*"}});
 app.use(express.static("public"));
+app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine','ejs');
-app.get('/',(req,res) =>{
-  res.render("canvas");
+app.get('/', (req, res) =>{
+  res.render("home");
+});
+let EnteredName=""; 
+app.post('/',(req,res) =>{
+  EnteredName=req.body.enteredName;
+  EnteredName=EnteredName.charAt(0).toUpperCase() + EnteredName.slice(1);
+  res.render("sketch");
 });
 const users={};
 
@@ -26,45 +34,42 @@ let correctAnswer;
 const totalUsers = 2;
 
 io.on('connection', socket =>{
-  socket.on('new-user-joined', name =>{
-    const ID=socket.id;
-    users[socket.id]=name;
-    socket.broadcast.emit('user-joined', name);
-    updateClients(ID);
+  users[socket.id]=EnteredName;
+  socket.broadcast.emit('user-joined', EnteredName);
 
-    socket.emit('userId', socket.id);
+  socket.emit('userId', socket.id);
+  updateClients();
 
-    if(Object.keys(users).length == totalUsers)
+  if(Object.keys(users).length == totalUsers)
+  {
+    //looping through the users
+
+    let count = 0;
+    for(let k=0;k<2;k++)
     {
-      //looping through the users
-
-      let count = 0;
-      for(let k=0;k<2;k++)
+      for(let i=0;i<Object.keys(users).length;i++)
       {
-        for(let i=0;i<Object.keys(users).length;i++)
-        {
-          setTimeout(function() {
-            let arr = randomNumbers();
-            let curUserID = Object.keys(users)[i];
-            console.log(curUserID);
+        setTimeout(function() {
+          let arr = randomNumbers();
+          let curUserID = Object.keys(users)[i];
+          console.log(curUserID);
 
-            console.log(count);
-            let assignedWords = [words[arr[0]],words[arr[1]],words[arr[2]]]
-            io.emit('restrictAccess', { id : curUserID})
-            io.emit('passRandomWords' , assignedWords);
-          
-          }, 10000*(count) );
-            count++;
-        }
+          console.log(count);
+          let assignedWords = [words[arr[0]],words[arr[1]],words[arr[2]]]
+          io.emit('restrictAccess', { id : curUserID})
+          io.emit('passRandomWords' , assignedWords);
+        
+        }, 100000*(count) );
+          count++;
       }
+    }
 
 
-    }
-    else
-    {
-      console.log("waiting for users to join");
-    }
-  });
+  }
+  else
+  {
+    console.log("waiting for users to join");
+  }
 
   socket.on('send', message =>{
     if(message === correctAnswer)
@@ -80,6 +85,7 @@ io.on('connection', socket =>{
   socket.on('disconnect', message =>{
     const ID=socket.id;
     socket.broadcast.emit('left', { id :socket.id , name : users[socket.id]});
+    delete users[socket.id];
     delete socket.id;
     updateClients(ID);
   });
@@ -113,12 +119,8 @@ io.on('connection', socket =>{
     socket.broadcast.emit('guessWord', data);
   });
 
-  function updateClients(ID) {
-    const data={
-      id: ID,
-      users: users
-    }
-    io.sockets.emit('update', data);
+  function updateClients() {
+    io.sockets.emit('update', users);
   }
 
 });
