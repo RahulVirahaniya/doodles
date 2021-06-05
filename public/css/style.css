@@ -94,6 +94,7 @@ aside{
   flex-direction: column;
   margin-left: 8px;
   margin-top: 40px;
+  border-radius: 10px;
 }
 .containerCanvas{
   display: flex;
@@ -104,13 +105,46 @@ aside{
 #canvas{
   background-color: #fff;
   image-rendering: pixelated;
+  border-radius: 10px;
 }
 .boxMessage{
-  height:560px;
+  height:360px;
   padding-top: 5px;
   overflow-y: auto;
   overflow-x: hidden;
+  border-radius: 5px;
 }
+
+.wordsBox{
+  border-radius: 5px;
+  height: 200px;
+  background-color: #deedf0;
+}
+.allWords{
+  margin-left:10px;
+  margin-right:10px;
+}
+.wordBoxHeading{
+  text-align:center;
+  font-size: 1rem;
+  font-weight: bold;
+  margin-top:5px;
+}
+.wordsRandom{
+  margin-left: 30px;
+  text-align:center;
+  height: 40px;
+  width: 250px;
+  background-color: #b6c9f0;
+  padding: 7px;
+  margin-top: 12px;
+  border:none;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+
 .form-control{
   width: 97%;
   margin-left:5.5px;
@@ -259,4 +293,13 @@ img {
 }
 #buttonClearCanvas:hover{
   opacity: 1;
+}
+
+.toHide{
+  display: none;
+}
+.disabledDiv {
+    pointer-events: none;
+    disabled : true;
+    /* opacity: 0.4; */
 }

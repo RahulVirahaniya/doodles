@@ -1,0 +1,105 @@
+.containerToolbar{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-top: 10px;
+  user-select: none;
+}
+.colorPreview {
+    flex: 0 0 auto;
+    height: 48px;
+    width: 48px;
+    margin-right: 8px;
+    border-radius: 2px;
+    background-color: #fff;
+}
+#colorPicker {
+    flex: 0 0 auto;
+    height: 48px;
+    width: 48px;
+    margin-right: 8px;
+    border-radius: 2px;
+    background-color: #fff;
+    cursor: pointer;
+}
+.containerColorbox {
+    flex: 0 0 auto;
+    height: 100%;
+    margin-right: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+.containerColorColumn {
+    height: 24px;
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+.containerColorColumn:first-child .colorItem:first-child {
+    border-radius: 2px 0 0;
+}
+.containerColorColumn .colorItem {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    flex: 0 0 auto;
+}
+.containerTools {
+    display: flex;
+    margin-right: 8px;
+}
+.containerTools .toolActive {
+    background-color: #9664c8 !important;
+}
+.containerTools .tool {
+    cursor: pointer;
+    flex: 0 0 auto;
+    width: 48px;
+    height: 48px;
+    background-color: #fff;
+    border-radius: 2px;
+    margin-right: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.tool:hover{
+  background-color: #9664c8;
+}
+img {
+    vertical-align: middle;
+    border-style: none;
+}
+.colorItem:hover{
+  border: 2px solid black;
+}
+.containerBrushSizes {
+    display: flex;
+    height: 48px;
+    background-color: #fff;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+#myRange{
+  cursor: pointer;
+}
+.containerBrushSizes:hover{
+  background-color: #9664c8;
+}
+#buttonClearCanvas {
+    height: 100%;
+    width: 48px;
+    background-image: url("/images/clear.gif");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-left: 3px;
+    cursor: pointer;
+    opacity: .7;
+}
+#buttonClearCanvas:hover{
+  opacity: 1;
+}

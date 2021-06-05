@@ -41,7 +41,7 @@
     <div class="containerCanvas">
       <canvas id="canvas" height="600" width="800"></canvas>
     </div>
-    <div class="containerToolbar">
+    <div id= "toolbar" class="containerToolbar">
       <div class="colorPreview" data-toggle="tooltip" data-placement="top" title="" style="background-color: rgb(0, 0, 0);" data-original-title="Color preview"></div>
       <div class="containerColorbox" data-toggle="tooltip" data-placement="top" title="" data-original-title="Select a color">
         <div class="containerColorColumn">
@@ -85,7 +85,16 @@
       </div>
     </div>
   </main>
+
   <aside>
+    <div id="wordsContainer" class="wordsBox">
+      <div id="wordBox" class="allWords">
+        <div class="wordBoxHeading">Select a Word</div>
+        <button id="word1" class="wordsRandom"></button>
+        <button id="word2" class="wordsRandom"></button>
+        <button id="word3" class="wordsRandom"></button>
+      </div>
+    </div>
     <div class="boxMessage"></div>
     <div class="send">
       <form action="#" id="send-message">
@@ -98,6 +107,8 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF" crossorigin="anonymous"></script>
   <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
   <script src="Js/sketch.js" charset="utf-8"></script>
+  <!-- <script src="Js/chat.js" charset="utf-8"></script>
+  <script src="Js/playersList.js" charset="utf-8"></script> -->
 </body>
 
 </html>

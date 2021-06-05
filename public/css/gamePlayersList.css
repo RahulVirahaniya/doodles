@@ -1,0 +1,69 @@
+#containerPlayerList{
+  width: 200px;
+  min-width: 200px;
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-right: 8px;
+  margin-top: 40px;
+}
+#containerGamePlayers {
+  display: flex;
+  flex-direction: column;
+  align-content: flex-start;
+  width: 200px;
+}
+#containerGamePlayers .player {
+  height: 48px;
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+#containerGamePlayers .player:nth-child(odd) {
+  background: #eee;
+}
+#containerGamePlayers .player:nth-child(even) {
+  background: #fafafa;
+}
+#containerGamePlayers .player:first-child {
+    border-radius: 2px 2px 0 0;
+}
+#containerGamePlayers .player .rank {
+  width: 34px;
+  flex: 0 0 auto;
+  color: #000;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 30px;
+  text-align: center;
+}
+#containerGamePlayers .player .info {
+  flex: 1 1 auto;
+  max-width: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1;
+  color: #000;
+  text-align: center;
+  word-wrap: break-word;
+}
+#containerGamePlayers .player .info .name {
+  flex: 1 1 auto;
+  font-size: 13px;
+  font-weight: 700;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+#containerGamePlayers .player .info .myName{
+  color: rgb(0, 0, 255);
+}
+#containerGamePlayers .player .info .score {
+  flex: 1 1 auto;
+  font-size: 14px;
+}
