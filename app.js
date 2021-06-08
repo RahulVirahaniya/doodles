@@ -22,7 +22,6 @@ const userScore = {};
 const guessOnlyOnce = {};
 
 const words=["car" , "bike" , "building" , "laptop" , "phone" , "well" , "pond" , "medicine" , "water" , "bottle"];
-
 function randomNumbers(){
 
   let x = Math.floor((Math.random() * 7) + 1);
@@ -104,7 +103,7 @@ io.on('connection', socket =>{
     const ID=socket.id;
     socket.broadcast.emit('left', { id :socket.id , name : users[socket.id]});
     delete users[socket.id];
-    delete socket.id;
+    delete userScore[socket.id];
     updateClients(ID);
   });
 
@@ -151,7 +150,6 @@ io.on('connection', socket =>{
         if(b[1]==a[1]) {
           return -1;
         }
-
         return b[1] - a[1];
     });
 
