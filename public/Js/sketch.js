@@ -39,6 +39,13 @@ const append= (name, message, mode, type) =>{
   // }
 }
 
+// bringing in id
+
+let curUserId = 0;
+socket.on('userId', data =>{
+  curUserId = data;
+});
+
 // add your message to the message box
 
 form.addEventListener('submit', (e)=>{
@@ -51,7 +58,7 @@ form.addEventListener('submit', (e)=>{
   const name="You: ";
   append(`${name}`, `${message}`, 'right', '');
   scrollToBottom();
-  socket.emit('send', message);
+  socket.emit('send', {id: curUserId, message:message});
   inputChat.value="";
 });
 let name;
@@ -61,12 +68,6 @@ socket.on('user-joined', name =>{
   scrollToBottom();
 });
 
-// bringing in id
-
-let curUserId = 0;
-socket.on('userId', data =>{
-  curUserId = data;
-});
 // adding players to the score list
 
 const appendPlayers = (rank, key, name, ID, score) => {
@@ -100,11 +101,10 @@ const appendPlayers = (rank, key, name, ID, score) => {
 }
 
 // appneding players to the players list
-
-socket.on('update', function (users){
+socket.on('update', function (data){
   $('#containerGamePlayers').empty();
-  for (let [key, value] of Object.entries(users)) {
-    appendPlayers("#1", `${key}`, `${value}`, curUserId, "Points: 10");
+    for (let [key, value, rank] of data.userScoreArr) {
+      appendPlayers(rank, `${key}`, `${data.users[key]}`, `${curUserId}`, `${value}`);
   }
 });
 
@@ -117,11 +117,11 @@ socket.on('recieve', data =>{
       append(`${data.name}: `, `${data.message}`, 'left', '');
       scrollToBottom();
   }
-  else
-  {
-    append(`${data.name}: `,"guessed the answer" , 'left', 'green');
-    scrollToBottom();
-  }
+});
+
+socket.on("someoneGuessedAns", data => {
+  append(`${data.name} `, `${data.message}`, 'left', 'green');
+  scrollToBottom();
 });
 
 // when a player leaves
@@ -219,7 +219,7 @@ function checkWord( id, data)
 
 
 socket.on('youGuessedRight' , (id, name, message) =>{
-  append("You: ", "guessed the right answer", 'right', '');
+  append("You ", "guessed the right answer!", 'right', 'green');
 })
 
 
