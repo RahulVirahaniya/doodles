@@ -143,8 +143,8 @@ socket.on('toAll' , data =>{
 
 let accessId ;
 socket.on('restrictAccess', id =>{
+  const hint = document.getElementById("hint");
   clearTheBoard();
-  //console.log(id.id);
   accessId = id.id;
   const toolbar = document.getElementById('toolbar');
   // giving access to the user
@@ -152,6 +152,11 @@ socket.on('restrictAccess', id =>{
   {
     toolbar.classList.remove('toHide');
     socket.emit('removeToolbar' , id);
+    hint.innerHTML="";
+    hint.classList.add('toHide');
+  } else {
+    hint.innerHTML="";
+    hint.classList.remove('toHide');
   }
 });
 
@@ -161,6 +166,16 @@ socket.on('hideToolbar', id =>{
     toolbar.classList.add('toHide');
 })
 
+// receiving timer data 
+socket.on('timer', data=> {
+  document.getElementById("timer").innerHTML = data;
+});
+
+// getting automatically selected random word from backend
+socket.on('autoChosenWord', data=> {
+  getSelectedWord(data);
+});
+
 // showing words on screen
 
 socket.on('passRandomWords' , data =>{
@@ -168,20 +183,25 @@ socket.on('passRandomWords' , data =>{
   const allWords = document.getElementById('wordBox');
   if(curUserId === accessId)
   {
+    const wordBoxHeading= document.getElementById('wordBoxHeading');
+    wordBoxHeading.classList.remove('toHide');
 
     console.log(data);
     socket.emit('removeWordBox');
     const word1 = document.getElementById('word1');
+    word1.classList.remove('selectedWord');
     word1.innerHTML = data[0];
     word1.setAttribute('onclick','getSelectedWord(this.innerHTML)')
 
 
     const word2 = document.getElementById('word2');
+    word2.classList.remove('toHide');
     word2.innerHTML = data[1];
     word2.setAttribute('onclick','getSelectedWord(this.innerHTML)')
 
 
     const word3 = document.getElementById('word3');
+    word3.classList.remove('toHide');
     word3.innerHTML = data[2];
     word3.setAttribute('onclick','getSelectedWord(this.innerHTML)')
 
@@ -201,11 +221,31 @@ function getSelectedWord(data)
 {
   curSelectedWord = data;
   socket.emit('curChosenWord' , data);
+  const wordBoxHeading= document.getElementById('wordBoxHeading');
+  wordBoxHeading.classList.add('toHide');
+  const word1 = document.getElementById('word1');
+  const word2 = document.getElementById('word2');
+  const word3 = document.getElementById('word3');
+
+  word2.classList.add('toHide');
+  word3.classList.add('toHide');
+  word1.classList.add('selectedWord');
+  word1.innerHTML = data;
 }
 
 socket.on('guessWord' , data =>{
   curSelectedWord = data;
 })
+
+// Guess Word Hint
+socket.on('ansHint', data=>{
+
+  const hint = document.getElementById("hint");
+  if(curUserId !== accessId)
+  {
+    hint.innerHTML=data.hint;
+  } 
+});
 
 function checkWord( id, data)
 {
@@ -218,6 +258,9 @@ function checkWord( id, data)
 
 
 socket.on('youGuessedRight' , (id, name, message) =>{
+  const hint = document.getElementById("hint");
+  hint.innerHTML="";
+  hint.classList.add('toHide');
   append("You ", "guessed the right answer!", 'right', 'green');
 })
 

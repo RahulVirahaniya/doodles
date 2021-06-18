@@ -24,9 +24,17 @@ const guessOnlyOnce = {};
 const words=["car" , "bike" , "building" , "laptop" , "phone" , "well" , "pond" , "medicine" , "water" , "bottle"];
 function randomNumbers(){
 
-  let x = Math.floor((Math.random() * 7) + 1);
-  let y = x+1;
-  let z = y+1;
+  let x = Math.floor((Math.random() * words.length) );
+  let y = Math.floor((Math.random() * words.length) );
+  while(x == y)
+  {
+    y = Math.floor((Math.random() * words.length) );
+  }
+  let z = Math.floor((Math.random() * words.length) );
+  while(z==y || z==x)
+  {
+    z = Math.floor((Math.random() * words.length));
+  }
   return [x,y,z];
 }
 
@@ -35,6 +43,7 @@ let correctAnswer;
 const totalUsers = 2;
 
 let curActiveUser;
+let wordSelectedTillNow = true;
 
 io.on('connection', socket =>{
   users[socket.id]=EnteredName;
@@ -55,6 +64,7 @@ io.on('connection', socket =>{
       for(let i=0;i<Object.keys(users).length;i++)
       {
         setTimeout(function() {
+          wordSelectedTillNow = false;
           let arr = randomNumbers();
 
           correctAnswer="";
@@ -63,7 +73,69 @@ io.on('connection', socket =>{
           console.log(curUserID);
 
           console.log(count);
-          let assignedWords = [words[arr[0]],words[arr[1]],words[arr[2]]]
+          let assignedWords = [words[arr[0]],words[arr[1]],words[arr[2]]];
+
+          let seconds = 20;
+          let TimeUpTime = 20;
+          let timerData="";
+          let ansHint="";
+      
+          let x = setInterval(function() {
+      
+              if (seconds < 1) {
+                clearInterval(x);   
+                correctAnswer="";
+                timerData="Time Over!";
+              } else if(seconds>TimeUpTime-10 && !wordSelectedTillNow) {
+                timerData="Choose a word in "+(seconds-(TimeUpTime-10))+" sec";
+                remainingTime=seconds;
+              } else {
+
+                // automatically choosing a word for drawing
+                if(correctAnswer=="") {
+                  correctAnswer= assignedWords[Math.floor(Math.random() * 3)];
+                  io.to(curActiveUser).emit('autoChosenWord', correctAnswer);
+                  wordSelectedTillNow=false;
+                }
+
+                //hint 
+                if(seconds==5) {
+                  let x = Math.floor((Math.random() * correctAnswer.length) );
+                  let y = Math.floor((Math.random() * correctAnswer.length) );
+                  while(x == y)
+                  {
+                    y = Math.floor((Math.random() * correctAnswer.length) );
+                  }
+
+                  ansHint="";
+
+                  for(let m=0; m<correctAnswer.length; m++) {
+                    if(m==x){
+                      ansHint+=correctAnswer[x];
+                    } else if (m==y) {
+                      ansHint+=correctAnswer[y];
+                    } else {
+                      ansHint+="_ ";
+                    }
+                  }
+
+                }  else if(seconds>5) {
+                  ansHint="";
+                  for(let count=0; count<correctAnswer.length; count++) {
+                    ansHint+="_ ";
+                  }
+                }  
+
+                io.emit('ansHint', {hint: ansHint});
+
+                timerData="Time Over in "+seconds+ " sec";
+              }
+              
+              io.to(curActiveUser).emit('timer', timerData);
+              seconds--;
+      
+            }, 1000);
+            
           io.emit('restrictAccess', { id : curUserID});
           io.emit('passRandomWords' , assignedWords);
 
@@ -71,7 +143,7 @@ io.on('connection', socket =>{
                 guessOnlyOnce[Object.keys(users)[j]]=true;
             }
 
-        }, 20000*(count) );
+          }, 22000*(count) );
           count++;
       }
     }
@@ -132,8 +204,9 @@ io.on('connection', socket =>{
   });
 
   socket.on('curChosenWord', (data)=>{
+    wordSelectedTillNow=true;
     correctAnswer = data;
-    socket.broadcast.emit('guessWord', data);
+    socket.broadcast.emit('guessWord', data); //check
   });
 
   function updateClients(ID) {
