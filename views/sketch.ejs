@@ -6,11 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
   <link rel="stylesheet" href="css/sketch.css">
+  <link rel="stylesheet" href="css/gamePlayersList.css">
+  <link rel="stylesheet" href="css/toolbarStyle.css">
+  <link rel="stylesheet" href="css/chat.css">
   <link rel="shortcut icon" href="images/img.png">
   <title>Doodles</title>
 </head>
 
 <body>
+  <div id="doodlesName">Doodles</div>
   <div id="containerPlayerList">
     <div id="containerGamePlayers">
       <!-- <div class="player" id="player112">
@@ -91,11 +95,13 @@
   <aside>
     <div id="wordsContainer" class="wordsBox">
       <div id="wordBox" class="allWords">
-        <div class="wordBoxHeading">Select a Word</div>
+        <div id="wordBoxHeading">Select a Word</div>
         <button id="word1" class="wordsRandom"></button>
         <button id="word2" class="wordsRandom"></button>
         <button id="word3" class="wordsRandom"></button>
+        <div id="timer" class="timerHintContainer wordsRandom"></div>
       </div>
+      <div id="hint" class="timerHintContainer wordsRandom"></div>
     </div>
     <div class="boxMessage"></div>
     <div class="send">

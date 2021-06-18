@@ -16,9 +16,7 @@ const word2 = document.getElementById('word2');
 const word3 = document.getElementById('word3');
 //const audio= new Audio("ting.mp3")
 
-
 // add other's message to the message box
-
 const append= (name, message, mode, type) =>{
   const messageElement = document.createElement('div');
   const span1=document.createElement('span');
@@ -101,6 +99,7 @@ const appendPlayers = (rank, key, name, ID, score) => {
 }
 
 // appneding players to the players list
+
 socket.on('update', function (data){
   $('#containerGamePlayers').empty();
     for (let [key, value, rank] of data.userScoreArr) {
@@ -144,8 +143,8 @@ socket.on('toAll' , data =>{
 
 let accessId ;
 socket.on('restrictAccess', id =>{
+  const hint = document.getElementById("hint");
   clearTheBoard();
-  //console.log(id.id);
   accessId = id.id;
   const toolbar = document.getElementById('toolbar');
   // giving access to the user
@@ -153,6 +152,11 @@ socket.on('restrictAccess', id =>{
   {
     toolbar.classList.remove('toHide');
     socket.emit('removeToolbar' , id);
+    hint.innerHTML="";
+    hint.classList.add('toHide');
+  } else {
+    hint.innerHTML="";
+    hint.classList.remove('toHide');
   }
 });
 
@@ -162,6 +166,16 @@ socket.on('hideToolbar', id =>{
     toolbar.classList.add('toHide');
 })
 
+// receiving timer data 
+socket.on('timer', data=> {
+  document.getElementById("timer").innerHTML = data;
+});
+
+// getting automatically selected random word from backend
+socket.on('autoChosenWord', data=> {
+  getSelectedWord(data);
+});
+
 // showing words on screen
 
 socket.on('passRandomWords' , data =>{
@@ -169,20 +183,25 @@ socket.on('passRandomWords' , data =>{
   const allWords = document.getElementById('wordBox');
   if(curUserId === accessId)
   {
+    const wordBoxHeading= document.getElementById('wordBoxHeading');
+    wordBoxHeading.classList.remove('toHide');
 
     console.log(data);
     socket.emit('removeWordBox');
     const word1 = document.getElementById('word1');
+    word1.classList.remove('selectedWord');
     word1.innerHTML = data[0];
     word1.setAttribute('onclick','getSelectedWord(this.innerHTML)')
 
 
     const word2 = document.getElementById('word2');
+    word2.classList.remove('toHide');
     word2.innerHTML = data[1];
     word2.setAttribute('onclick','getSelectedWord(this.innerHTML)')
 
 
     const word3 = document.getElementById('word3');
+    word3.classList.remove('toHide');
     word3.innerHTML = data[2];
     word3.setAttribute('onclick','getSelectedWord(this.innerHTML)')
 
@@ -202,11 +221,31 @@ function getSelectedWord(data)
 {
   curSelectedWord = data;
   socket.emit('curChosenWord' , data);
+  const wordBoxHeading= document.getElementById('wordBoxHeading');
+  wordBoxHeading.classList.add('toHide');
+  const word1 = document.getElementById('word1');
+  const word2 = document.getElementById('word2');
+  const word3 = document.getElementById('word3');
+
+  word2.classList.add('toHide');
+  word3.classList.add('toHide');
+  word1.classList.add('selectedWord');
+  word1.innerHTML = data;
 }
 
 socket.on('guessWord' , data =>{
   curSelectedWord = data;
 })
+
+// Guess Word Hint
+socket.on('ansHint', data=>{
+
+  const hint = document.getElementById("hint");
+  if(curUserId !== accessId)
+  {
+    hint.innerHTML=data.hint;
+  } 
+});
 
 function checkWord( id, data)
 {
@@ -219,6 +258,9 @@ function checkWord( id, data)
 
 
 socket.on('youGuessedRight' , (id, name, message) =>{
+  const hint = document.getElementById("hint");
+  hint.innerHTML="";
+  hint.classList.add('toHide');
   append("You ", "guessed the right answer!", 'right', 'green');
 })
 
@@ -235,7 +277,7 @@ $(document).ready(function(){
 //  canvas code
 let painting=false;
 // const restrict = ()=>  {
-  let color=document.querySelector('.colorPreview').style.backgroundColor;
+  let color=colorPreview.style.backgroundColor;
   let size=6;
   let pencil_mode=true, eraser_mode=false, fill_mode=false, flag=true;
 
@@ -245,18 +287,24 @@ let painting=false;
   }
   function myRange(){
     size=document.getElementById("myRange").value;
+    if(pencil_mode){
+      pencil();
+    }
   }
   function colorPicker(){
+    colorPreview.style.backgroundColor=document.getElementById("colorPicker").value;
     if(eraser_mode==false){
       color=document.getElementById("colorPicker").value;
+      if(fill_mode===false){
+        pencil();
+      }
     }
-    document.querySelector('.colorPreview').style.backgroundColor=document.getElementById("colorPicker").value;
   }
   function change_color(element){
     if(eraser_mode===false){
       color=element.style.background;
     }
-    document.querySelector('.colorPreview').style.backgroundColor=element.style.background;
+    colorPreview.style.backgroundColor=element.style.background;
   }
   function svgUrl(size) {
     const radius=size/2;
@@ -266,7 +314,7 @@ let painting=false;
     $('.tool').removeClass("toolActive");
     var data_tool=$(this).attr('data-tool');
     $('.tool[data-tool = '+data_tool+']').addClass("toolActive");
-  })
+  });
   function pencil(){
     pencil_mode=true;
     eraser_mode=false;
@@ -274,7 +322,7 @@ let painting=false;
     canvas.addEventListener('mouseover',(e)=>{
       $('canvas').css("cursor", `${svgUrl(size)} ${size} ${size}, auto`)
     });
-    color=document.querySelector('.colorPreview').style.backgroundColor;
+    color=colorPreview.style.backgroundColor;
   }
   function eraser(){
     color="white";
@@ -301,23 +349,21 @@ let painting=false;
   ////////////// editing here
 
   function draw(e){
-    // console.log(curId);
-        // console.log(curUserId ,  accessId);
-        if(curUserId != accessId || !painting || fill_mode) return;
-        ctx.lineWidth=size;
-        ctx.lineCap="round";
-        ctx.strokeStyle=color;
-        ctx.lineTo(e.offsetX,e.offsetY);
-        ctx.stroke();
-        ctx.beginPath();
-        let data = {
-          x: e.offsetX,
-          y: e.offsetY,
-          size: size,
-          color: color
-        }
-        socket.emit('mouse', data);
-        ctx.moveTo(e.offsetX,e.offsetY);
+    if(curUserId != accessId || !painting || fill_mode) return;
+    ctx.lineWidth=size;
+    ctx.lineCap="round";
+    ctx.strokeStyle=color;
+    ctx.lineTo(e.offsetX,e.offsetY);
+    ctx.stroke();
+    ctx.beginPath();
+    let data = {
+      x: e.offsetX,
+      y: e.offsetY,
+      size: size,
+      color: color
+    }
+    socket.emit('mouse', data);
+    ctx.moveTo(e.offsetX,e.offsetY);
   }
 
   function newDrawing(data){
@@ -428,14 +474,15 @@ let painting=false;
       const rect = canvas.getBoundingClientRect()
       const x = Math.round(event.clientX - rect.left)
       const y = Math.round(event.clientY - rect.top)
-      let rgb=document.querySelector('.colorPreview').style.backgroundColor
+      let rgb=colorPreview.style.backgroundColor
       rgb=rgb.substring(4, rgb.length-1).replace(/ /g, '').split(',');
       col={r: rgb[0], g: rgb[1], b: rgb[2], a: 0xff};
+      console.log(rgb);
       floodFill(imageData, col, x, y);
       ctx.putImageData(imageData, 0, 0);
       var img=canvas.toDataURL();
       socket.emit('fill', img);
-    })
+    });
   }
   function newFillCanvas(img){
     var myImage = new Image();
@@ -446,6 +493,9 @@ let painting=false;
   }
   function clear_canvas(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
+    if(fill_mode){
+      fill_canvas();
+    }
     socket.emit('clear');
   }
   function clearTheBoard(){

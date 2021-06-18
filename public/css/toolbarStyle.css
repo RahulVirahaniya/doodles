@@ -1,3 +1,6 @@
+.tooltip-wrapper {
+  display: inline-block;
+}
 .containerToolbar{
   display: flex;
   flex-direction: row;
@@ -102,4 +105,13 @@ img {
 }
 #buttonClearCanvas:hover{
   opacity: 1;
+}
+
+.toHide{
+  display: none;
+}
+.disabledDiv {
+    pointer-events: none;
+    disabled : true;
+    /* opacity: 0.4; */
 }
