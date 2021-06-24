@@ -44,6 +44,10 @@ const totalUsers = 2;
 
 let curActiveUser;
 let wordSelectedTillNow = true;
+let i=0;
+let k=0;
+let onlyOneUser=0;
+let x;
 
 io.on('connection', socket =>{
   users[socket.id]=EnteredName;
@@ -58,21 +62,35 @@ io.on('connection', socket =>{
   {
     //looping through the users
 
-    let count = 0;
-    for(let k=0;k<2;k++)
-    {
-      for(let i=0;i<Object.keys(users).length;i++)
-      {
-        setTimeout(function() {
+    let windowTime = setInterval(function() {
+
+      if(Object.keys(users).length==1) {
+        onlyOneUser++;
+        if(onlyOneUser==5) {
+          io.to(curActiveUser).emit('gameOver', '');
+          clearInterval(windowTime);
+        }
+      } else {
+        onlyOneUser=0;
+      }
+
+      if(Object.keys(users).length==0){
+        clearInterval(windowTime);
+      }
+
+      if(k%22==0) {
+
           wordSelectedTillNow = false;
           let arr = randomNumbers();
 
           correctAnswer="";
-          let curUserID = Object.keys(users)[i];
-          curActiveUser=curUserID;
-          console.log(curUserID);
+          if(i>=Object.keys(users).length || i<0) {
+            i=0;
+        }
 
-          console.log(count);
+          let curUserID = Object.keys(users)[i];
+          i++;
+          curActiveUser=curUserID;
           let assignedWords = [words[arr[0]],words[arr[1]],words[arr[2]]];
 
           let seconds = 20;
@@ -80,15 +98,16 @@ io.on('connection', socket =>{
           let timerData="";
           let ansHint="";
       
-          let x = setInterval(function() {
-      
+          clearInterval(x);
+
+           x = setInterval(function() {
               if (seconds < 1) {
                 clearInterval(x);   
                 correctAnswer="";
                 timerData="Time Over!";
               } else if(seconds>TimeUpTime-10 && !wordSelectedTillNow) {
-                timerData="Choose a word in "+(seconds-(TimeUpTime-10))+" sec";
-                remainingTime=seconds;
+                ansHint=users[curActiveUser]+" is choosing a word!";
+                timerData="Choose A Word in "+(seconds-(TimeUpTime-10))+" sec";
               } else {
 
                 // automatically choosing a word for drawing
@@ -126,28 +145,28 @@ io.on('connection', socket =>{
                   }
                 }  
 
-                io.emit('ansHint', {hint: ansHint});
+
 
                 timerData="Time Over in "+seconds+ " sec";
               }
               
+              io.emit('ansHint', {hint: ansHint});
               io.to(curActiveUser).emit('timer', timerData);
               seconds--;
       
             }, 1000);
             
-          io.emit('restrictAccess', { id : curUserID});
+          io.emit('restrictAccess', { id : curUserID, activeUsername: users[curUserID]});
           io.emit('passRandomWords' , assignedWords);
 
             for(let j=0;j<Object.keys(users).length;j++) {
                 guessOnlyOnce[Object.keys(users)[j]]=true;
             }
+        }
 
-          }, 22000*(count) );
-          count++;
-      }
-    }
-
+        k++;
+        k=k%22;
+      }, 1000);
 
   }
   else
@@ -160,7 +179,7 @@ io.on('connection', socket =>{
     // checking answers
     if(data.message === correctAnswer && correctAnswer!="" && curActiveUser!=data.id && guessOnlyOnce[data.id])
     {
-        userScore[data.id]+= 10;
+        userScore[data.id]+=(100-5*Math.floor(k/5));
         socket.emit('youGuessedRight', {id :data.id , name: "You", message: "guessed the right answer!"});
         socket.broadcast.emit('someoneGuessedAns', {id :data.id , name: users[data.id], message: " guessed the right answer!"});
         updateClients(data.id);
@@ -172,6 +191,13 @@ io.on('connection', socket =>{
   });
 
   socket.on('disconnect', message =>{
+    if(Object.keys(users).indexOf(socket.id)<i) {
+      i--;
+    }
+    if(socket.id==curActiveUser) {
+      clearInterval(x);
+      k=22;
+    }
     const ID=socket.id;
     socket.broadcast.emit('left', { id :socket.id , name : users[socket.id]});
     delete users[socket.id];
@@ -206,7 +232,7 @@ io.on('connection', socket =>{
   socket.on('curChosenWord', (data)=>{
     wordSelectedTillNow=true;
     correctAnswer = data;
-    socket.broadcast.emit('guessWord', data); //check
+    socket.broadcast.emit('guessWord', data);  //Check
   });
 
   function updateClients(ID) {

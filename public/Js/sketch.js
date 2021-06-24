@@ -5,6 +5,7 @@ socket.on('fill', newFillCanvas);
 socket.on('clear', clearTheBoard);
 const containerGamePlayers=document.getElementById('containerGamePlayers');
 const wordsContainer=document.getElementById('wordsContainer');
+const wordSelectAndHint = document.getElementById('wordSelectAndHint');
 const canvas=document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const form=document.getElementById('send-message');
@@ -142,22 +143,27 @@ socket.on('toAll' , data =>{
 
 
 let accessId ;
-socket.on('restrictAccess', id =>{
+socket.on('restrictAccess', data =>{
   const hint = document.getElementById("hint");
   clearTheBoard();
-  accessId = id.id;
+  accessId = data.id;
   const toolbar = document.getElementById('toolbar');
   // giving access to the user
   if(curUserId === accessId)
   {
     toolbar.classList.remove('toHide');
-    socket.emit('removeToolbar' , id);
+    socket.emit('removeToolbar' , data.id);
     hint.innerHTML="";
     hint.classList.add('toHide');
+    append("You", " are Drawing Now!", 'left', 'green');
+    scrollToBottom();
   } else {
     hint.innerHTML="";
     hint.classList.remove('toHide');
+    append(data.activeUsername, " is Drawing Now!", 'left', 'green');
+    scrollToBottom();
   }
+  wordSelectAndHint.style.display='block';
 });
 
 //  hiding toolbar for other users
@@ -220,7 +226,6 @@ let curSelectedWord;
 function getSelectedWord(data)
 {
   curSelectedWord = data;
-  socket.emit('curChosenWord' , data);
   const wordBoxHeading= document.getElementById('wordBoxHeading');
   wordBoxHeading.classList.add('toHide');
   const word1 = document.getElementById('word1');
@@ -231,6 +236,7 @@ function getSelectedWord(data)
   word3.classList.add('toHide');
   word1.classList.add('selectedWord');
   word1.innerHTML = data;
+  socket.emit('curChosenWord' , data);
 }
 
 socket.on('guessWord' , data =>{
@@ -245,6 +251,14 @@ socket.on('ansHint', data=>{
   {
     hint.innerHTML=data.hint;
   } 
+});
+
+// gameOver when only one user
+
+socket.on('gameOver', data => {
+  append("You ", " WON the game!!!", 'right', 'green');
+  scrollToBottom();
+  window.location.href = window.location.href;
 });
 
 function checkWord( id, data)
@@ -262,6 +276,7 @@ socket.on('youGuessedRight' , (id, name, message) =>{
   hint.innerHTML="";
   hint.classList.add('toHide');
   append("You ", "guessed the right answer!", 'right', 'green');
+  scrollToBottom();
 })
 
 
