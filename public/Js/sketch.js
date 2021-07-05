@@ -15,6 +15,8 @@ const colorPreview=document.querySelector('.colorPreview');
 const word1 = document.getElementById('word1');
 const word2 = document.getElementById('word2');
 const word3 = document.getElementById('word3');
+
+let popUp = document.getElementById("pvtRoomPopUp");
 //const audio= new Audio("ting.mp3")
 
 // add other's message to the message box
@@ -138,7 +140,7 @@ function scrollToBottom(){
 }
 
 socket.on('toAll' , data =>{
-  console.log(data);
+  // console.log(data);
 });
 
 
@@ -151,6 +153,7 @@ socket.on('restrictAccess', data =>{
   // giving access to the user
   if(curUserId === accessId)
   {
+    document.getElementById("timer").classList.remove('toHide');
     toolbar.classList.remove('toHide');
     socket.emit('removeToolbar' , data.id);
     hint.innerHTML="";
@@ -172,7 +175,7 @@ socket.on('hideToolbar', id =>{
     toolbar.classList.add('toHide');
 })
 
-// receiving timer data 
+// receiving timer data
 socket.on('timer', data=> {
   document.getElementById("timer").innerHTML = data;
 });
@@ -192,7 +195,7 @@ socket.on('passRandomWords' , data =>{
     const wordBoxHeading= document.getElementById('wordBoxHeading');
     wordBoxHeading.classList.remove('toHide');
 
-    console.log(data);
+    // console.log(data);
     socket.emit('removeWordBox');
     const word1 = document.getElementById('word1');
     word1.classList.remove('selectedWord');
@@ -250,7 +253,7 @@ socket.on('ansHint', data=>{
   if(curUserId !== accessId)
   {
     hint.innerHTML=data.hint;
-  } 
+  }
 });
 
 // gameOver when only one user
@@ -279,6 +282,19 @@ socket.on('youGuessedRight' , (id, name, message) =>{
   scrollToBottom();
 })
 
+
+socket.on('gameFinished', (data) =>{
+  // show popup
+  popUp.style.display = "flex";
+  console.log(data);
+  document.getElementById('winner').innerHTML = data.winnername;
+  document.getElementById('yourRank').innerHTML = data.rank[curUserId];
+  // popUp.classList.remove('toHide');
+})
+
+document.getElementById("close").addEventListener('click', function() {
+  popUp.style.display = "none";
+});
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -492,7 +508,7 @@ let painting=false;
       let rgb=colorPreview.style.backgroundColor
       rgb=rgb.substring(4, rgb.length-1).replace(/ /g, '').split(',');
       col={r: rgb[0], g: rgb[1], b: rgb[2], a: 0xff};
-      console.log(rgb);
+      // console.log(rgb);
       floodFill(imageData, col, x, y);
       ctx.putImageData(imageData, 0, 0);
       var img=canvas.toDataURL();

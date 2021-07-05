@@ -6,22 +6,40 @@ const io=require('socket.io')(server, {cors: {origin: "*"}});
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine','ejs');
+
 app.get('/', (req, res) =>{
   res.render("home");
 });
+
 let EnteredName="";
+
 app.post('/',(req,res) =>{
   EnteredName=req.body.enteredName;
   EnteredName=EnteredName.charAt(0).toUpperCase() + EnteredName.slice(1);
   res.render("sketch");
 });
+
 const users={};
-
 const userScore = {};
-
 const guessOnlyOnce = {};
+let correctAnswer;
+const totalUsers = 2;
+let curActiveUser;
+let wordSelectedTillNow = true;
+let i=0;
+let k=0;
+let onlyOneUser=0;
+let x;
+let roundCount = {};
+let curWinner;
+let userRank = {};
 
-const words=["car" , "bike" , "building" , "laptop" , "phone" , "well" , "pond" , "medicine" , "water" , "bottle"];
+const words=["car" , "bike" , "building" , "laptop" , "phone" , "well" , "pond" , "medicine" , "water" , "bottle" , "cap" ,
+"dog" , "cat" , "puppy" , "remote"] ;
+
+
+
+
 function randomNumbers(){
 
   let x = Math.floor((Math.random() * words.length) );
@@ -38,20 +56,12 @@ function randomNumbers(){
   return [x,y,z];
 }
 
-let correctAnswer;
-
-const totalUsers = 2;
-
-let curActiveUser;
-let wordSelectedTillNow = true;
-let i=0;
-let k=0;
-let onlyOneUser=0;
-let x;
 
 io.on('connection', socket =>{
   users[socket.id]=EnteredName;
   userScore[socket.id]=0;
+  roundCount[socket.id] = 0;
+  userRank[socket.id] = 0;
   guessOnlyOnce[socket.id]=true;
   socket.broadcast.emit('user-joined', EnteredName);
 
@@ -88,21 +98,37 @@ io.on('connection', socket =>{
             i=0;
         }
 
+        let seconds = 20;
+        let TimeUpTime = 20;
+        let timerData="";
+        let ansHint="";
+
           let curUserID = Object.keys(users)[i];
+          roundCount[curUserID] += 1;
+          console.log(curUserID , roundCount[curUserID] );
+
+          if(roundCount[curUserID] === 2)
+          {
+            seconds = -1;
+            clearInterval(windowTime);
+            // console.log(userScore);
+            console.log("here is the current winner");
+            console.log(curWinner);
+            io.emit('gameFinished', {rank : userRank , winnername: users[curWinner] } );
+            delete users;
+            delete userScore;
+            delete userRank;
+          }
+
           i++;
           curActiveUser=curUserID;
           let assignedWords = [words[arr[0]],words[arr[1]],words[arr[2]]];
 
-          let seconds = 20;
-          let TimeUpTime = 20;
-          let timerData="";
-          let ansHint="";
-      
           clearInterval(x);
 
            x = setInterval(function() {
               if (seconds < 1) {
-                clearInterval(x);   
+                clearInterval(x);
                 correctAnswer="";
                 timerData="Time Over!";
               } else if(seconds>TimeUpTime-10 && !wordSelectedTillNow) {
@@ -117,7 +143,7 @@ io.on('connection', socket =>{
                   wordSelectedTillNow=false;
                 }
 
-                //hint 
+                //hint
                 if(seconds==5) {
                   let x = Math.floor((Math.random() * correctAnswer.length) );
                   let y = Math.floor((Math.random() * correctAnswer.length) );
@@ -143,19 +169,19 @@ io.on('connection', socket =>{
                   for(let count=0; count<correctAnswer.length; count++) {
                     ansHint+="_ ";
                   }
-                }  
+                }
 
 
 
                 timerData="Time Over in "+seconds+ " sec";
               }
-              
+
               io.emit('ansHint', {hint: ansHint});
               io.to(curActiveUser).emit('timer', timerData);
               seconds--;
-      
+
             }, 1000);
-            
+
           io.emit('restrictAccess', { id : curUserID, activeUsername: users[curUserID]});
           io.emit('passRandomWords' , assignedWords);
 
@@ -202,6 +228,7 @@ io.on('connection', socket =>{
     socket.broadcast.emit('left', { id :socket.id , name : users[socket.id]});
     delete users[socket.id];
     delete userScore[socket.id];
+    delete userRank[socket.id];
     updateClients(ID);
   });
 
@@ -238,7 +265,6 @@ io.on('connection', socket =>{
   function updateClients(ID) {
 
     // object conversion to array AND score wise sorting
-
     let userScoreArr = [];
     for (let id in userScore) {
         // userScoreArr[...][0] => id , userScoreArr[...][1] => score, userScoreArr[...][2] => rank
@@ -252,21 +278,25 @@ io.on('connection', socket =>{
         return b[1] - a[1];
     });
 
-
     // rank calculation
     let rank=1;
     for(let i=0;i<userScoreArr.length; i++) {
       if(i==0) {
-        userScoreArr[0][2] = rank;
+        userScoreArr[i][2] = rank;
+        userRank[userScoreArr[i][0]] = rank;
       } else {
         if(userScoreArr[i][1]==userScoreArr[i-1][1]) {
           userScoreArr[i][2] = rank;
         } else {
           rank++;
           userScoreArr[i][2] = rank;
+          userRank[userScoreArr[i][0]] = rank;
         }
       }
     }
+
+    if(userScoreArr.length > 0)
+    curWinner = userScoreArr[0][0];
 
     const data={
       id: ID,

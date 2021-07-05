@@ -1,0 +1,38 @@
+
+.pvt-room-pop-up {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height:100%;
+    overflow-y:auto;
+    overflow-x: auto;
+    justify-content: center;
+    padding: 30px;
+    background-color: rgba(0,0,0,0.4);
+  }
+
+.pvt-room-pop-up::-webkit-scrollbar {
+      display: none;
+  }
+
+
+#pvtRoomDetails {
+  margin-top:100px;
+    color: #D3006C;
+    background-color: #ffffff;
+    padding: 10px 30px 50px;
+    border-radius: 5px;
+    width: 450px;
+    height: 300px;
+}
+
+#pvtRoomDetails::-webkit-scrollbar {
+    display: none;
+}
+
+#customWords {
+    resize: none;
+}

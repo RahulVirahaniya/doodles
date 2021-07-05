@@ -19,12 +19,12 @@ aside{
     border-radius: 5px;
   }
   .boxMessage::-webkit-scrollbar {
-    width: 14px; 
+    width: 14px;
     height: 0;
   }
   .boxMessage::-webkit-scrollbar-thumb {
     height: 1rem;
-    border: 0.25rem solid rgba(0, 0, 0, 0);  
+    border: 0.25rem solid rgba(0, 0, 0, 0);
     background-clip: padding-box;
     -webkit-border-radius: 1rem;
     background-color: rgba(0, 0, 0, 0.45);
@@ -51,26 +51,34 @@ aside{
     margin-right:10px;
   }
   .wordBoxHeading{
-    text-align:center;
     font-size: 1rem;
     font-weight: bold;
-    margin-top:5px;
   }
   .wordsRandom{
-    margin-left: 30px;
-    text-align:center;
-    height: 40px;
-    width: 250px;
-    background-color: #b6c9f0;
-    padding: 7px;
-    margin-top: 12px;
-    border:none;
-    font-size: 1rem;
-    font-weight: bold;
-    border-radius: 5px;
-  }
-  
-  
+      text-align:center;
+      background-color: #deedf0;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border-radius: 5px;
+      padding: 6px 10px;
+      border: 2px solid #D83A56;
+    }
+
+#word1{
+      margin-left: 55px;
+      margin-top:20px;
+}
+#word2{
+      margin-left: 40px;
+      margin-top:20px;
+}
+#word3{
+  text-align: center;
+  margin-top:20px;
+  margin-left: 130px;
+  /* margin-right: auto; */
+}
+
   .form-control{
     width: 97%;
     margin-left:5.5px;
