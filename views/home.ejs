@@ -15,16 +15,13 @@
           <img src="images/img.png">
           <h3>welcome to <span id="doodlesName">Doodles<span>.</h3>
         </div>
-        <div class="alert enter-form-element err-msg" id="emptyNameMsg">
-          Please enter your name to play.
-        </div>
+        <div class="alert enter-form-element err-msg" id="nameError"></div>
         <form action="/" method="POST" id='enterForm'>
             <div class="form-group enter-form-element">
-              <input type="text" class="form-control" name="enteredName" id="enteredNameId" onkeypress="return event.key!='Enter';" placeholder="Enter Your Name">
+              <input type="text" class="form-control" name="enteredName" id="enteredNameId" onKeyPress="enterPress(event, this)" placeholder="Enter Your Name">
             </div>
             <div class="enter-form-element">
               <button type="button" class="btn btn-success" id="playBtn">Play</button>&nbsp;
-              <!-- <button type="button" class="btn btn-primary" id="enterPvtRoom">Enter Private Room</button> -->
             </div>
           </form>
         </div>
@@ -33,74 +30,6 @@
       <footer class="footer">
         Doodles @ 2021
       </footer>
-
-      <!-- <div  class="pvt-room-pop-up" id="pvtRoomPopUp"> 
-          
-          <div id="pvtRoomDetails">
-            
-            <div id="close">
-              <button type="button" class="close">
-                  &times;
-              </button>
-            </div>
-            <br>
-            <div class="alert enter-form-element err-msg" id="roomErr"></div>
-
-          <form action="/" method="POST">   
-            <div class="form-group">
-              <label for="enteredName">Name</label>
-              <input type="text" class="form-control" id="enteredName" name="playerName" placeholder="Your Name" required>
-            </div>
-
-            <div class="form-group">
-             <label for="timeLimit">Draw time in seconds </label>
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <label class="input-group-text" for="selectTimeLimit">Time Limit</label>
-                </div>
-                <select class="custom-select" name="timeLimit"  id="timeLimit" required>
-                 <% for(var i=30; i<=180; i+=10) { %>
-                   <option><%= i %></option>
-                  <% } %>
-                </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-              <label>Number of ROUNDs</label>
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <label class="input-group-text" for="selectRound">ROUNDS</label>
-                </div>
-                <select class="custom-select" name="noRounds" id="selectRound" required>
-                 <% for(var i=1; i<=10; i++) { %>
-                   <option><%= i %></option>
-                  <% } %>
-                </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-              <label for="customWords">Custom Words (Character Limit : 30) (Optional)</label>
-                  <textarea class="form-control" id="customWords" rows="3" name="customWordsList" placeholder="Laptop Mobile Tree Pegasus (...etc)" disabled></textarea>
-                  <input type="checkbox" aria-label="Checkbox for following text input" id="customCheck"> <small>Enter Custom Words</small>
-            </div>
-
-            <div class="enter-form-element">
-              <button type="button" class="btn btn-success" id="enterRoomBtn">Enter</button>&nbsp;&nbsp;
-              <button type="button" class="btn btn-danger clear">Clear</button>
-            </div>
-
-            
-          </form>
-
-            <div class="enter-form-element" >
-              <div class="room-url">Hover here for the URL and Invite Your Friends.</div>&nbsp;
-             <button type="button" class="url-copy">Copy</button>
-            </div>
-
-          </div>
-      </div> -->
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>

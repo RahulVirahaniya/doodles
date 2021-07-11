@@ -4,6 +4,7 @@ socket.on('mouseup', newFinishedPosition);
 socket.on('fill', newFillCanvas);
 socket.on('clear', clearTheBoard);
 const containerGamePlayers=document.getElementById('containerGamePlayers');
+const playersResult=document.getElementById('playersResult');
 const wordsContainer=document.getElementById('wordsContainer');
 const wordSelectAndHint = document.getElementById('wordSelectAndHint');
 const canvas=document.getElementById('canvas');
@@ -15,8 +16,9 @@ const colorPreview=document.querySelector('.colorPreview');
 const word1 = document.getElementById('word1');
 const word2 = document.getElementById('word2');
 const word3 = document.getElementById('word3');
-
-let popUp = document.getElementById("pvtRoomPopUp");
+const popUp = document.getElementById("pvtRoomPopUp");
+const timer = document.getElementById('timer');
+const wordBox = document.getElementById('wordBox');
 //const audio= new Audio("ting.mp3")
 
 // add other's message to the message box
@@ -57,7 +59,7 @@ form.addEventListener('submit', (e)=>{
     return;
   }
   const name="You: ";
-  append(`${name}`, `${message}`, 'right', '');
+  // append(`${name}`, `${message}`, 'right', '');
   scrollToBottom();
   socket.emit('send', {id: curUserId, message:message});
   inputChat.value="";
@@ -67,28 +69,28 @@ socket.on('user-joined', name =>{
   name=name.charAt(0).toUpperCase() + name.slice(1);
   append(`${name}`, " joined the chat", 'left', 'green');
   scrollToBottom();
+  let img=canvas.toDataURL();
+  socket.emit('fill', img);
 });
 
 // adding players to the score list
-
-const appendPlayers = (rank, key, name, ID, score) => {
+const appendPlayers = (rank, key, name, score, curActiveUser, flag) => {
   const players=document.createElement('div');
   players.classList.add('player');
-  if(players.hasAttribute('id') == null)
-  {
-    players.setAttribute("id" , curUserId);
-  }
   containerGamePlayers.appendChild(players);
+  players.setAttribute("id" , key);
+  if(!flag)
+    players.style.backgroundColor="#82c669";
   const playerRank=document.createElement('div')
   playerRank.classList.add('rank');
   players.appendChild(playerRank);
-  playerRank.innerText=rank;
+  playerRank.innerText="#"+rank;
   const info=document.createElement('div');
   info.classList.add('info');
   players.appendChild(info);
   const playername=document.createElement('div');
   playername.classList.add('name');
-  if(key===ID){
+  if(key===curUserId){
     playername.classList.add('myName');
     playername.innerText=name+" (You)";
   }else {
@@ -98,31 +100,51 @@ const appendPlayers = (rank, key, name, ID, score) => {
   const playerScore=document.createElement('div');
   playerScore.classList.add('score');
   info.appendChild(playerScore);
-  playerScore.innerText=score;
+  playerScore.innerText="Points: "+score;
+  const pencil = document.createElement('div');
+  pencil.classList.add('pencil');
+  players.appendChild(pencil);
+  if(key == curActiveUser)
+    pencil.innerHTML='<img class="toolIcon" src="images/pen.gif">';
 }
 
-// appneding players to the players list
+// appending players to the players list
 
 socket.on('update', function (data){
   $('#containerGamePlayers').empty();
     for (let [key, value, rank] of data.userScoreArr) {
-      appendPlayers(rank, `${key}`, `${data.users[key]}`, `${curUserId}`, `${value}`);
+      appendPlayers(rank, key, data.users[key], value, data.curActiveUser, data.guessOnlyOnce[key]);
   }
 });
 
 
 // others message to the left
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-socket.on('recieve', data =>{
-  if(checkWord(data.id, data.message))
-  {
-      append(`${data.name}: `, `${data.message}`, 'left', '');
-      scrollToBottom();
+socket.on('receive', data =>{
+  if(data.id === curUserId) {
+    append('You: ', data.message, 'right', '');
+  } else {
+    append(`${data.name}: `, data.message, 'left', '');
   }
+  scrollToBottom();
 });
 
-socket.on("someoneGuessedAns", data => {
-  append(`${data.name} `, `${data.message}`, 'left', 'green');
+// Right answer guessed
+socket.on("answerGuessed", data => {
+  if(curUserId === data.id){
+    append("You", " guessed the right answer!", 'right', 'green');
+  } else {
+    append(`${data.name}`, " guessed the right answer!", 'left', 'green');
+  }
+  scrollToBottom();
+});
+
+// close to the right answer
+
+socket.on("closeToAnswer", data =>{
+  if(data.id !== accessId) {
+    append(`'${data.message}'`, " is close!", 'right', 'yellow');
+  }
   scrollToBottom();
 });
 
@@ -133,63 +155,117 @@ socket.on('left', data=>{
   scrollToBottom();
 });
 
+// when disconnected from server side
+
+socket.on('disconnect', () =>{
+  window.location.href=window.location.href;
+});
+
 // chat scrolls to bottom
 
 function scrollToBottom(){
   boxMessage.scrollTop=boxMessage.scrollHeight;
 }
 
-socket.on('toAll' , data =>{
-  // console.log(data);
-});
+let painting=false;
+let color=colorPreview.style.backgroundColor;
+let size=6;
+let pencil_mode=true, eraser_mode=false, fill_mode=false, flag=true;
+let accessId = '';
 
-
-let accessId ;
 socket.on('restrictAccess', data =>{
   const hint = document.getElementById("hint");
   clearTheBoard();
   accessId = data.id;
   const toolbar = document.getElementById('toolbar');
+  timer.classList.remove('toHide');
+  hint.innerHTML="";
+  hint.classList.add('toHide');
   // giving access to the user
   if(curUserId === accessId)
   {
-    document.getElementById("timer").classList.remove('toHide');
     toolbar.classList.remove('toHide');
     socket.emit('removeToolbar' , data.id);
-    hint.innerHTML="";
-    hint.classList.add('toHide');
-    append("You", " are Drawing Now!", 'left', 'green');
+    append("You", " are Drawing Now!", 'right', 'blue');
+    $("#votekickCurrentplayer").prop('disabled', true);
+    $(".tooltip-wrapper").addClass("disabled");
     scrollToBottom();
   } else {
-    hint.innerHTML="";
-    hint.classList.remove('toHide');
-    append(data.activeUsername, " is Drawing Now!", 'left', 'green');
+    append(data.activeUsername, " is Drawing Now!", 'left', 'blue');
+    $("#votekickCurrentplayer").prop('disabled', false);
+    $(".tooltip-wrapper").removeClass("disabled");
     scrollToBottom();
   }
   wordSelectAndHint.style.display='block';
 });
 
+// click to voteKick the current player
+
+$("#votekickCurrentplayer").on('click', () =>{
+  socket.emit('voteKick', '');
+  $("#votekickCurrentplayer").prop('disabled', true);
+  $(".tooltip-wrapper").addClass("disabled");
+});
+
+// Remove the current player by voteKick
+
+socket.on('voteKickMessage', data =>{
+  if(curUserId !== data.id) {
+    append(`'${data.voteKicker}'`, ` is voting to kick '${data.currDrawer}' (${data.voteKickCount}/${data.userLength})`, 'left', 'yellow');
+  } else {
+    append('You', ` have voted to kick '${data.currDrawer}' (${data.voteKickCount}/${data.userLength})`, 'right', 'yellow')
+  }
+});
+
+socket.on('voteKickCurrentPlayer', data => {
+  window.location.href = window.location.href;
+});
+
 //  hiding toolbar for other users
+
 socket.on('hideToolbar', id =>{
     const toolbar = document.getElementById('toolbar');
     toolbar.classList.add('toHide');
 })
 
 // receiving timer data
+
 socket.on('timer', data=> {
-  document.getElementById("timer").innerHTML = data;
+
+  if($('#timer').hasClass('toHide')){
+    timer.classList.remove('toHide');
+  }
+  if(curUserId==accessId){
+    timer.innerHTML = data.timerData;
+  } else {
+    timer.innerHTML = data.timerOthers;
+  }
 });
 
 // getting automatically selected random word from backend
+
 socket.on('autoChosenWord', data=> {
   getSelectedWord(data);
+});
+
+// shows correct answer after time out
+
+socket.on('correctAnswer', data =>{
+  if(curUserId != accessId){
+    append("The word was ",`'${data}'`, 'left', 'green');
+  }
+});
+
+// Round of the game
+
+socket.on('round', data => {
+  document.getElementById("round").innerText=`Round ${data} out of 3`;
 });
 
 // showing words on screen
 
 socket.on('passRandomWords' , data =>{
 
-  const allWords = document.getElementById('wordBox');
   if(curUserId === accessId)
   {
     const wordBoxHeading= document.getElementById('wordBoxHeading');
@@ -214,21 +290,20 @@ socket.on('passRandomWords' , data =>{
     word3.innerHTML = data[2];
     word3.setAttribute('onclick','getSelectedWord(this.innerHTML)')
 
-    allWords.classList.remove('toHide');
+    wordBox.classList.remove('toHide');
+    wordBox.style.display='flex';
   }
 
 })
 
 socket.on('hideWordBox', id =>{
-      const wordBox = document.getElementById('wordBox');
-      wordBox.classList.add('toHide');
-})
+  wordBox.classList.add('toHide');
+  wordBox.style.display='none';
+});
 
-let curSelectedWord;
 
 function getSelectedWord(data)
 {
-  curSelectedWord = data;
   const wordBoxHeading= document.getElementById('wordBoxHeading');
   wordBoxHeading.classList.add('toHide');
   const word1 = document.getElementById('word1');
@@ -242,75 +317,60 @@ function getSelectedWord(data)
   socket.emit('curChosenWord' , data);
 }
 
-socket.on('guessWord' , data =>{
-  curSelectedWord = data;
-})
-
 // Guess Word Hint
-socket.on('ansHint', data=>{
 
+socket.on('ansHint', data=>{
   const hint = document.getElementById("hint");
-  if(curUserId !== accessId)
-  {
+  if(curUserId !== accessId) {
+    hint.classList.remove('toHide');
     hint.innerHTML=data.hint;
   }
 });
 
-// gameOver when only one user
+// append final result of the players
 
-socket.on('gameOver', data => {
-  append("You ", " WON the game!!!", 'right', 'green');
-  scrollToBottom();
-  window.location.href = window.location.href;
-});
-
-function checkWord( id, data)
-{
-  if(data === curSelectedWord)
-  {
-    return 0;
+const appendResult = (rank, key, name, score) => {
+  const finalPlayer=document.createElement('div');
+  finalPlayer.classList.add('finalPlayer');
+  const finalPlayerRank=document.createElement('div')
+  finalPlayerRank.classList.add('finalPlayerRank');
+  finalPlayer.appendChild(finalPlayerRank);
+  finalPlayerRank.innerText="# "+rank;
+  const finalPlayerName=document.createElement('div');
+  finalPlayerName.classList.add('finalPlayerName');
+  if(key == curUserId){
+    finalPlayerName.classList.add('myName');
+    finalPlayerName.innerText=name+" (You)";
+  }else {
+    finalPlayerName.innerText=name;
   }
-  return 1;
+  finalPlayer.appendChild(finalPlayerName);
+  const finalPlayerScore=document.createElement('div');
+  finalPlayerScore.classList.add('finalPlayerScore');
+  finalPlayer.appendChild(finalPlayerScore);
+  finalPlayerScore.innerText=score;
+  playersResult.appendChild(finalPlayer);
 }
-
-
-socket.on('youGuessedRight' , (id, name, message) =>{
-  const hint = document.getElementById("hint");
-  hint.innerHTML="";
-  hint.classList.add('toHide');
-  append("You ", "guessed the right answer!", 'right', 'green');
-  scrollToBottom();
-})
-
-
 socket.on('gameFinished', (data) =>{
   // show popup
+  for (let [key, value, rank] of data.userScoreArr) {
+    appendResult(rank, key, data.users[key], value);
+  }
+  popUp.classList.remove('toHide');
   popUp.style.display = "flex";
-  console.log(data);
-  document.getElementById('winner').innerHTML = data.winnername;
-  document.getElementById('yourRank').innerHTML = data.rank[curUserId];
-  // popUp.classList.remove('toHide');
-})
-
-document.getElementById("close").addEventListener('click', function() {
-  popUp.style.display = "none";
+  setTimeout(() => {
+    socket.disconnect();
+    window.location.href = window.location.href;
+  }, 5000);
 });
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
-
 $(document).ready(function(){
   $('[data-toggle="tooltip"]').tooltip();
 });
-
 //  canvas code
-let painting=false;
-// const restrict = ()=>  {
-  let color=colorPreview.style.backgroundColor;
-  let size=6;
-  let pencil_mode=true, eraser_mode=false, fill_mode=false, flag=true;
 
   if(flag){
     pencil();
@@ -501,17 +561,17 @@ let painting=false;
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     let col;
     canvas.addEventListener('click', event => {
-      if(pencil_mode || eraser_mode) return;
+      if(pencil_mode || eraser_mode || curUserId !== accessId) return;
+      clear_canvas();
       const rect = canvas.getBoundingClientRect()
       const x = Math.round(event.clientX - rect.left)
       const y = Math.round(event.clientY - rect.top)
       let rgb=colorPreview.style.backgroundColor
       rgb=rgb.substring(4, rgb.length-1).replace(/ /g, '').split(',');
       col={r: rgb[0], g: rgb[1], b: rgb[2], a: 0xff};
-      // console.log(rgb);
       floodFill(imageData, col, x, y);
       ctx.putImageData(imageData, 0, 0);
-      var img=canvas.toDataURL();
+      let img=canvas.toDataURL();
       socket.emit('fill', img);
     });
   }
@@ -541,4 +601,13 @@ let painting=false;
 
   canvas.addEventListener("touchmove",draw);
   canvas.addEventListener("mousemove",draw);
-// }
+
+  // disconnect on refresh of user
+
+  if (sessionStorage.getItem("is_reloaded")) {
+    sessionStorage.removeItem("is_reloaded");
+    socket.disconnect();
+    window.location.href = window.location.href;
+  } else {
+    sessionStorage.setItem("is_reloaded", true);
+  }

@@ -1,38 +1,56 @@
 
 .pvt-room-pop-up {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height:100%;
-    overflow-y:auto;
-    overflow-x: auto;
-    justify-content: center;
-    padding: 30px;
-    background-color: rgba(0,0,0,0.4);
-  }
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height:100%;
+  overflow: auto;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0,0,0,0.4);
+}
 
 .pvt-room-pop-up::-webkit-scrollbar {
-      display: none;
-  }
-
+    display: none;
+}
 
 #pvtRoomDetails {
-  margin-top:100px;
-    color: #D3006C;
-    background-color: #ffffff;
-    padding: 10px 30px 50px;
-    border-radius: 5px;
-    width: 450px;
-    height: 300px;
+  color: #78d300;
+  background-color: #ffffff;
+  padding: 10px 50px;
+  border-radius: 5px;
+  width: 450px;
 }
 
 #pvtRoomDetails::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
-#customWords {
-    resize: none;
+.gameOver{
+  font-size: 25px;;
+  font-weight: bold;
+  font-family: cursive;
+  display: flex;
+  justify-content: center;
+}
+#playersResult{
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+.finalPlayer{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  font-size: 18px;
+  font-family: cursive;
+}
+.backToHome{
+  display: flex;
+  justify-content: center;
 }

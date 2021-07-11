@@ -1,12 +1,21 @@
 #containerPlayerList{
   width: 200px;
   min-width: 200px;
-  height: 600px;
+  height: 640px;
   display: flex;
   flex-direction: column;
-  /* justify-content: space-between; */
+  justify-content: space-between;
   margin-right: 8px;
-  margin-top: 40px;
+  margin-top: 5px;
+  padding-top: 7px;
+}
+#doodlesName {
+  text-align: center;
+  font-size: 1.4rem;
+  height: 30px;
+  font-weight: bold;
+  color: #0C4271;
+  font-family: 'Press Start 2P', cursive;
 }
 #containerGamePlayers {
   display: flex;
@@ -20,7 +29,6 @@
   flex: 0 0 auto;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
   align-items: center;
 }
 #containerGamePlayers .player:nth-child(odd) {
@@ -46,15 +54,15 @@
   max-width: 100px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   line-height: 1;
   color: #000;
   text-align: center;
   word-wrap: break-word;
+  margin-left: 20px;
 }
 #containerGamePlayers .player .info .name {
   flex: 1 1 auto;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   overflow: hidden;
   white-space: nowrap;
@@ -66,4 +74,9 @@
 #containerGamePlayers .player .info .score {
   flex: 1 1 auto;
   font-size: 14px;
+  margin-top: 2px;
+}
+.pencil{
+  position: absolute;
+  right: 5px;
 }

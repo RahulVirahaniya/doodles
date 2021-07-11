@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const app=express();
 const server=require('http').createServer(app);
 const io=require('socket.io')(server, {cors: {origin: "*"}});
+const words = require("./gameWords");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine','ejs');
@@ -12,34 +13,27 @@ app.get('/', (req, res) =>{
 });
 
 let EnteredName="";
+const users={};
 
 app.post('/',(req,res) =>{
+  if(Object.keys(users).length>7) res.redirect('/');
   EnteredName=req.body.enteredName;
   EnteredName=EnteredName.charAt(0).toUpperCase() + EnteredName.slice(1);
   res.render("sketch");
 });
 
-const users={};
 const userScore = {};
 const guessOnlyOnce = {};
+let userScoreArr = [];
 let correctAnswer;
 const totalUsers = 2;
-let curActiveUser;
+let curActiveUser = '';
 let wordSelectedTillNow = true;
-let i=0;
-let k=0;
+let nextUser=0;
+let timePassed=0;
 let onlyOneUser=0;
-let x;
-let roundCount = {};
-let curWinner;
-let userRank = {};
-
-const words=["car" , "bike" , "building" , "laptop" , "phone" , "well" , "pond" , "medicine" , "water" , "bottle" , "cap" ,
-"dog" , "cat" , "puppy" , "remote"] ;
-
-
-
-
+let x, round=1, hint1=-1, hint2=-1, hint3=-1;
+let voteKickCount=0;
 function randomNumbers(){
 
   let x = Math.floor((Math.random() * words.length) );
@@ -60,68 +54,66 @@ function randomNumbers(){
 io.on('connection', socket =>{
   users[socket.id]=EnteredName;
   userScore[socket.id]=0;
-  roundCount[socket.id] = 0;
-  userRank[socket.id] = 0;
   guessOnlyOnce[socket.id]=true;
   socket.broadcast.emit('user-joined', EnteredName);
 
   socket.emit('userId', socket.id);
   updateClients();
 
-  if(Object.keys(users).length == totalUsers)
+  if(Object.keys(users).length === totalUsers)
   {
     //looping through the users
 
     let windowTime = setInterval(function() {
-
-      if(Object.keys(users).length==1) {
+      if(Object.keys(users).length == 0){
+        clearInterval(windowTime);
+        clearInterval(x);
+        round=1;
+        hint1=hint2=hint3=-1;
+        return;
+      }
+      if(Object.keys(users).length == 1) {
         onlyOneUser++;
-        if(onlyOneUser==5) {
-          io.to(curActiveUser).emit('gameOver', '');
+        if(onlyOneUser == 5) {
+          round=1;
+          io.emit('gameFinished', {userScoreArr: userScoreArr, users: users } );
           clearInterval(windowTime);
+          clearInterval(x);
         }
       } else {
         onlyOneUser=0;
       }
 
-      if(Object.keys(users).length==0){
-        clearInterval(windowTime);
-      }
+      if(timePassed%92 == 0) {
 
-      if(k%22==0) {
+        wordSelectedTillNow = false;
+        let arr = randomNumbers();
 
-          wordSelectedTillNow = false;
-          let arr = randomNumbers();
-
-          correctAnswer="";
-          if(i>=Object.keys(users).length || i<0) {
-            i=0;
-        }
-
-        let seconds = 20;
-        let TimeUpTime = 20;
-        let timerData="";
-        let ansHint="";
-
-          let curUserID = Object.keys(users)[i];
-          roundCount[curUserID] += 1;
-          console.log(curUserID , roundCount[curUserID] );
-
-          if(roundCount[curUserID] === 2)
-          {
-            seconds = -1;
+        correctAnswer="";
+        let userLength=Object.keys(users).length;
+        if(nextUser !== 0 && nextUser%userLength == 0) {
+          nextUser=0;
+          round++;
+          if(round === 4) {
             clearInterval(windowTime);
-            // console.log(userScore);
-            console.log("here is the current winner");
-            console.log(curWinner);
-            io.emit('gameFinished', {rank : userRank , winnername: users[curWinner] } );
+            io.emit('gameFinished', {userScoreArr: userScoreArr, users: users } );
             delete users;
             delete userScore;
-            delete userRank;
+            round=1;
+            return;
           }
+        }
 
-          i++;
+        let seconds = 90;
+        let timerData="";
+        let ansHint="";
+        let timerOthers="";
+        voteKickCount=0;    
+        let curUserID = Object.keys(users)[nextUser];
+
+          nextUser++;
           curActiveUser=curUserID;
+          hint1=hint2=hint3=-1;
           let assignedWords = [words[arr[0]],words[arr[1]],words[arr[2]]];
 
           clearInterval(x);
@@ -129,12 +121,14 @@ io.on('connection', socket =>{
            x = setInterval(function() {
               if (seconds < 1) {
                 clearInterval(x);
-                correctAnswer="";
+                timerOthers="Time Over!";
                 timerData="Time Over!";
-              } else if(seconds>TimeUpTime-10 && !wordSelectedTillNow) {
-                ansHint=users[curActiveUser]+" is choosing a word!";
-                timerData="Choose A Word in "+(seconds-(TimeUpTime-10))+" sec";
-              } else {
+                hint1 = -1;
+                hint2 = -1;
+              } else if(seconds>80 && !wordSelectedTillNow) {
+                timerOthers=users[curActiveUser]+" is choosing a word!";
+                timerData="Choose A Word in "+(seconds-80)+" sec";
+              } else if(seconds%10 == 0) {
 
                 // automatically choosing a word for drawing
                 if(correctAnswer=="") {
@@ -144,92 +138,145 @@ io.on('connection', socket =>{
                 }
 
                 //hint
-                if(seconds==5) {
-                  let x = Math.floor((Math.random() * correctAnswer.length) );
-                  let y = Math.floor((Math.random() * correctAnswer.length) );
-                  while(x == y)
-                  {
-                    y = Math.floor((Math.random() * correctAnswer.length) );
+                if(seconds == 60) {
+                  hint1 = Math.floor((Math.random() * correctAnswer.length) );
+                } else if(seconds == 20) {
+                  hint2 = Math.floor((Math.random() * correctAnswer.length) );
+                  while(hint1 == hint2) {
+                    hint2 = Math.floor((Math.random() * correctAnswer.length) );
                   }
-
-                  ansHint="";
-
-                  for(let m=0; m<correctAnswer.length; m++) {
-                    if(m==x){
-                      ansHint+=correctAnswer[x];
-                    } else if (m==y) {
-                      ansHint+=correctAnswer[y];
-                    } else {
-                      ansHint+="_ ";
-                    }
+                } else if(seconds == 40 && correctAnswer.length>5){
+                  hint3 = Math.floor((Math.random() * correctAnswer.length) );
+                  while(hint3 == hint2 || hint3 == hint1) {
+                    hint3 = Math.floor((Math.random() * correctAnswer.length) );
                   }
-
-                }  else if(seconds>5) {
-                  ansHint="";
-                  for(let count=0; count<correctAnswer.length; count++) {
+                }
+                ansHint="";
+                for(let count=0; count<correctAnswer.length; count++) {
+                  if(hint1 !== -1 && count == hint1){
+                    ansHint+=correctAnswer[hint1]+" ";
+                  } else if(hint2 !== -1 && count == hint2) {
+                    ansHint+=correctAnswer[hint2]+" ";
+                  } else if(hint3 !==-1 && count == hint3) {
+                    ansHint+=correctAnswer[hint3]+" "; 
+                  } else {
                     ansHint+="_ ";
                   }
                 }
-
-
-
-                timerData="Time Over in "+seconds+ " sec";
+              
+                io.emit('ansHint', {hint: ansHint});
+              } 
+              if(seconds<=80 || wordSelectedTillNow) {
+                timerOthers=users[curActiveUser]+" time Over in "+seconds+ " sec";
+                timerData="Your time Over in "+seconds+" sec";
+                ansHint="";
+                for(let count=0; count<correctAnswer.length; count++){
+                  ansHint+="_ ";
+                }
+                if(seconds>80)
+                  io.emit('ansHint', {hint: ansHint});
               }
-
-              io.emit('ansHint', {hint: ansHint});
-              io.to(curActiveUser).emit('timer', timerData);
+              io.emit('timer', {timerData: timerData, timerOthers: timerOthers});
+              if(seconds < 1){
+                io.emit('correctAnswer', correctAnswer);
+                correctAnswer="";
+              }
               seconds--;
 
             }, 1000);
-
-          io.emit('restrictAccess', { id : curUserID, activeUsername: users[curUserID]});
-          io.emit('passRandomWords' , assignedWords);
-
+          setTimeout(() =>{
+            updateClients(socket.id);
+            io.emit('restrictAccess', { id : curUserID, activeUsername: users[curUserID]});
+            io.emit('passRandomWords' , assignedWords);
+          }, 1000);
             for(let j=0;j<Object.keys(users).length;j++) {
-                guessOnlyOnce[Object.keys(users)[j]]=true;
+              guessOnlyOnce[Object.keys(users)[j]]=true;
             }
         }
 
-        k++;
-        k=k%22;
+        timePassed++;
+        io.emit('round', round);
+        timePassed = timePassed%92;
       }, 1000);
 
-  }
-  else
-  {
+  } else {
     console.log("waiting for users to join");
   }
 
   socket.on('send', data =>{
 
-    // checking answers
-    if(data.message === correctAnswer && correctAnswer!="" && curActiveUser!=data.id && guessOnlyOnce[data.id])
-    {
-        userScore[data.id]+=(100-5*Math.floor(k/5));
-        socket.emit('youGuessedRight', {id :data.id , name: "You", message: "guessed the right answer!"});
-        socket.broadcast.emit('someoneGuessedAns', {id :data.id , name: users[data.id], message: " guessed the right answer!"});
-        updateClients(data.id);
-        guessOnlyOnce[data.id]=false;
+    let newMessage = data.message.toLowerCase().replace(" ","");
+    let newCorrectAnswer = correctAnswer.toLowerCase().replace(" ","");
+
+    // longest common subsequence of guessed answer and correct answer
+
+    let n = newMessage.length;
+    let m = newCorrectAnswer.length;
+    let dp = new Array(n+1);
+    for(let i=0; i<=n; i++){
+      dp[i] = new Array(m+1);
     }
-
-      socket.broadcast.emit('recieve', {id :data.id , name: users[data.id], message: data.message});
-
+    for(let i=0; i<=n; i++){
+      for(let j=0; j<=m; j++){
+        if(i ===0 || j === 0)
+          dp[i][j]=0;
+        else if(newMessage[i-1] === newCorrectAnswer[j-1])
+          dp[i][j] = 1+dp[i-1][j-1];
+        else 
+          dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+      }
+    }
+    
+    // checking answers
+    if(newMessage === newCorrectAnswer && newCorrectAnswer != "")
+    {
+      if(curActiveUser != data.id && guessOnlyOnce[data.id]) {
+        userScore[data.id]+=(450-5*timePassed);
+        io.emit('answerGuessed', {id: data.id, name: users[data.id]});
+        guessOnlyOnce[data.id]=false;
+        updateClients(data.id);
+      }
+    } else if(Math.abs(n-dp[n][m]) <= 1 && Math.abs(m-dp[n][m]) <= 1) {
+      if(guessOnlyOnce[data.id]){
+        socket.emit('closeToAnswer', {id: data.id, message: data.message});
+      }
+    } else {
+      io.emit('receive', {id :data.id, name: users[data.id], message: data.message});
+    }
   });
 
   socket.on('disconnect', message =>{
-    if(Object.keys(users).indexOf(socket.id)<i) {
-      i--;
+    if(Object.keys(users).indexOf(socket.id) < nextUser) {
+      nextUser--;
     }
-    if(socket.id==curActiveUser) {
+    if(socket.id == curActiveUser) {
       clearInterval(x);
-      k=22;
+      timePassed=92;
     }
-    const ID=socket.id;
     socket.broadcast.emit('left', { id :socket.id , name : users[socket.id]});
     delete users[socket.id];
     delete userScore[socket.id];
-    delete userRank[socket.id];
-    updateClients(ID);
+    delete guessOnlyOnce[socket.id];
+    updateClients(socket.id);
+  });
+
+  // votekick
+  socket.on('voteKick', message => {
+    let userLength=Object.keys(users).length;
+    if(userLength === 1) return;
+    voteKickCount++;
+    userLength=Math.ceil(userLength/2);
+    const data={
+      id: socket.id,
+      voteKicker: users[socket.id],
+      currDrawer: users[curActiveUser],
+      voteKickCount: voteKickCount,
+      userLength: userLength,
+    }
+    io.emit('voteKickMessage', data);
+    if(voteKickCount === userLength){
+      io.to(curActiveUser).emit('voteKickCurrentPlayer', '');
+    }
   });
 
   socket.on('mouse', (data)=>{
@@ -259,13 +306,13 @@ io.on('connection', socket =>{
   socket.on('curChosenWord', (data)=>{
     wordSelectedTillNow=true;
     correctAnswer = data;
-    socket.broadcast.emit('guessWord', data);  //Check
   });
 
   function updateClients(ID) {
 
     // object conversion to array AND score wise sorting
-    let userScoreArr = [];
+    while(userScoreArr.length>0)
+      userScoreArr.pop();
     for (let id in userScore) {
         // userScoreArr[...][0] => id , userScoreArr[...][1] => score, userScoreArr[...][2] => rank
         userScoreArr.push([id, userScore[id], 0]);
@@ -283,14 +330,14 @@ io.on('connection', socket =>{
     for(let i=0;i<userScoreArr.length; i++) {
       if(i==0) {
         userScoreArr[i][2] = rank;
-        userRank[userScoreArr[i][0]] = rank;
+        // userRank[userScoreArr[i][0]] = rank;
       } else {
         if(userScoreArr[i][1]==userScoreArr[i-1][1]) {
           userScoreArr[i][2] = rank;
         } else {
           rank++;
           userScoreArr[i][2] = rank;
-          userRank[userScoreArr[i][0]] = rank;
+          // userRank[userScoreArr[i][0]] = rank;
         }
       }
     }
@@ -299,10 +346,10 @@ io.on('connection', socket =>{
     curWinner = userScoreArr[0][0];
 
     const data={
-      id: ID,
       users: users,
-      score: userScore,
       userScoreArr: userScoreArr,
+      guessOnlyOnce: guessOnlyOnce,
+      curActiveUser: curActiveUser
     }
 
     io.sockets.emit('update', data);

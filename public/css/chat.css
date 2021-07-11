@@ -1,125 +1,165 @@
 aside{
-    display: flex;
-    justify-content: flex-start;
-    width: 340px;
-    min-width: 340px;
-    height: 600px;
-    background-color: #EEEEEE;
-    display: flex;
-    flex-direction: column;
-    margin-left: 8px;
-    margin-top: 40px;
-    border-radius: 10px;
-  }
+  display: flex;
+  justify-content: flex-start;
+  width: 340px;
+  min-width: 340px;
+  height: 600px;
+  background-color: #EEEEEE;
+  display: flex;
+  flex-direction: column;
+  margin-left: 8px;
+  margin-top: 45px;
+  border-radius: 10px;
+  padding-bottom: 5px;
+  position: relative;
+}
 .boxMessage{
-    height:360px;
-    padding-top: 5px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    border-radius: 5px;
-  }
-  .boxMessage::-webkit-scrollbar {
-    width: 14px;
-    height: 0;
-  }
-  .boxMessage::-webkit-scrollbar-thumb {
-    height: 1rem;
-    border: 0.25rem solid rgba(0, 0, 0, 0);
-    background-clip: padding-box;
-    -webkit-border-radius: 1rem;
-    background-color: rgba(0, 0, 0, 0.45);
-    -webkit-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.025);
-  }
-  .boxMessage::-webkit-scrollbar-thumb:hover{
-    background-color: rgba(0, 0, 0, 0.2);
-  }
-  .boxMessage::-webkit-scrollbar-button {
-    width: 0;
-    height: 0;
-    display: none;
-  }
-  .boxMessage::-webkit-scrollbar-corner {
-    background-color: transparent;
-  }
-  .wordsBox{
-    border-radius: 5px;
-    height: 200px;
-    background-color: #deedf0;
-  }
-  .allWords{
-    margin-left:10px;
-    margin-right:10px;
-  }
-  .wordBoxHeading{
-    font-size: 1rem;
-    font-weight: bold;
-  }
-  .wordsRandom{
-      text-align:center;
-      background-color: #deedf0;
-      font-size: 1.2rem;
-      font-weight: bold;
-      border-radius: 5px;
-      padding: 6px 10px;
-      border: 2px solid #D83A56;
-    }
+  max-height:440px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 5px;
+  margin-top: 5px;
+  margin-bottom: 35px;
+}
+.boxMessage::-webkit-scrollbar {
+  width: 14px;
+  height: 0;
+}
+.boxMessage::-webkit-scrollbar-thumb {
+  height: 1rem;
+  border: 0.25rem solid rgba(0, 0, 0, 0);
+  background-clip: padding-box;
+  -webkit-border-radius: 1.2rem;
+  background-color: rgba(0, 0, 0, 0.45);
+  -webkit-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.025);
+}
+.boxMessage::-webkit-scrollbar-thumb:hover{
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.boxMessage::-webkit-scrollbar-button {
+  width: 0;
+  height: 0;
+  display: none;
+}
+.boxMessage::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+.wordsBox{
+  padding-top: 5px;
+  border-radius: 5px;
+  min-height: 170px;
+  background-color: #deedf0;
+  padding-bottom: 5px;
+}
+.wordsRandom{
+  text-align:center;
+  background-color: #deedf0;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 5px;
+  padding: 6px 10px;
+}
+.selectedWord{
+  text-align:center;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-top:10px;
+  background-color: #00cc7a !important;
+  border-radius: 5px;
+  width: 250px;
+  min-height: 38px;
+  letter-spacing: 1px;
+}
+.timerHintContainer {
+  text-align:center;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 1rem;
+  font-weight: 900;
+  margin-top:10px;
+  background-color: #deedf0;
+  border-radius: 5px;
+  width: 250px;
+  min-height: 38px;
+  border: 1px solid #185ADB;
+}
 
-#word1{
-      margin-left: 55px;
-      margin-top:20px;
+#wordBoxHeading{
+  text-align:center;
+  font-size: 1rem;
+  font-weight: bold;
 }
-#word2{
-      margin-left: 40px;
-      margin-top:20px;
+#wordBox{
+  display: none;
+  flex-direction: column;
+  justify-content: center;
 }
-#word3{
-  text-align: center;
-  margin-top:20px;
-  margin-left: 130px;
-  /* margin-right: auto; */
+#hint{
+  font-size: 1rem;
+  letter-spacing: 2px;
+}
+#word1, #word2, #word3{
+  color: #fff;
+  background-color:  #ea4c89;
+  border: 0;
+  font-weight: 500 !important;
+  letter-spacing: 1px;
+  font-size: 1.1rem;
 }
 
-  .form-control{
-    width: 97%;
-    margin-left:5.5px;
-    font-size: 14px;
-    cursor: text;
-  }
-  .form-control::placeholder{
-    font-weight: 500;
-    color:#cccccc !important;
-  }
-  .boldName{
-    font-weight: 500;
-  }
-  .message{
-    width: 250px;
-    border-radius: 4px;
-    padding: 2px 5px;
-    margin: 0 5px 5px 5px;
-    word-wrap: break-word;
-  }
-  #inputChat:focus,textarea:focus,button:focus{
-    outline:0px !important;
-    -webkit-appearance:none;
-    box-shadow: none !important;
-  }
-  .left{
-    background-color: #fff;
-    float: left;
-  }
-  .right{
-    background-color: #fff;
-    float: right;
-  }
-  .green{
-    font-weight: 500;
-    color: rgb(86, 206, 39);
-  }
-  .red{
-    font-weight: 500;
-    color: rgb(206, 79, 10);
-  }
-  element.style {
-      background-color: rgb(0, 0, 0);
-  }
+#inputChat{
+  width: 97%;
+  margin-left:5.5px;
+  font-size: 14px;
+  cursor: text;
+  position: absolute;
+  bottom: 5px;
+}
+.inputChat::placeholder{
+  font-weight: 500;
+  color:#cccccc !important;
+}
+.boldName{
+  font-weight: 500;
+}
+.message{
+  width: 250px;
+  border-radius: 4px;
+  padding: 2px 5px;
+  margin: 0 5px 5px 5px;
+  word-wrap: break-word;
+}
+#inputChat:focus,textarea:focus,button:focus{
+  outline:0px !important;
+  -webkit-appearance:none;
+  box-shadow: none !important;
+}
+.left{
+  background-color: #fff;
+  float: left;
+}
+.right{
+  background-color: #fff;
+  float: right;
+}
+.green{
+  font-weight: 500;
+  color: rgb(86, 206, 39);
+}
+.red{
+  font-weight: 500;
+  color: rgb(206, 79, 10);
+}
+.blue{
+  font-weight: 500;
+  color: rgb(57, 117, 206);
+}
+.yellow{
+  font-weight: 500;
+  color: rgb(204, 204, 0);
+}
+element.style {
+    background-color: rgb(0, 0, 0);
+}
