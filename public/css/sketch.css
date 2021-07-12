@@ -51,6 +51,7 @@ body{
 @media only screen and (orientation:portrait){
   body { 
     height: 100vw; 
+    overflow: auto;
     -webkit-transform: rotate(90deg);
     -moz-transform: rotate(90deg);
     -o-transform: rotate(90deg);

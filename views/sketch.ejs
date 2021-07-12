@@ -30,54 +30,9 @@
           <button type="button" class="btn btn-warning btn-block" id="votekickCurrentplayer">Votekick</button>
         </div>
       </div>
-      <main>
         <div class="containerCanvas">
           <canvas id="canvas" height="600" width="800"></canvas>
         </div>
-        <div id= "toolbar" class="containerToolbar toHide">
-          <div class="colorPreview" data-toggle="tooltip" data-placement="top" title="" style="background-color: rgb(0, 0, 0);" data-original-title="Color preview"></div>
-          <div class="containerColorbox" data-toggle="tooltip" data-placement="top" title="" data-original-title="Select a color">
-            <div class="containerColorColumn">
-              <div onclick="change_color(this)" class="colorItem" data-color="0" style="background: #FFF"></div>
-              <div onclick="change_color(this)" class="colorItem" data-color="2" style="background: #C1C1C1"></div>
-              <div onclick="change_color(this)" class="colorItem" data-color="4" style="background: #EF130B"></div>
-              <div onclick="change_color(this)" class="colorItem" data-color="6" style="background: #FF7100"></div>
-              <div onclick="change_color(this)" class="colorItem" data-color="8" style="background: #FFE400"></div>
-              <div onclick="change_color(this)" class="colorItem" data-color="10" style="background: #00CC00"></div>
-              <div onclick="change_color(this)" class="colorItem" data-color="12" style="background: #00B2FF"></div>
-              <div onclick="change_color(this)" class="colorItem" data-color="14" style="background: #231FD3"></div>
-              <div onclick="change_color(this)" class="colorItem" data-color="16" style="background: #A300BA"></div>
-              <div onclick="change_color(this)" class="colorItem" data-color="18" style="background: #D37CAA"></div>
-              <div onclick="change_color(this)" class="colorItem" data-color="20" style="background: #A0522D"></div>
-            </div>
-            <div class="containerColorColumn">
-              <div onclick="change_color(this)"class="colorItem" data-color="1" style="background: #000"></div>
-              <div onclick="change_color(this)" class="colorItem" data-color="3" style="background: #4C4C4C"></div>
-              <div onclick="change_color(this)"class="colorItem" data-color="5" style="background: #740B07"></div>
-              <div onclick="change_color(this)" class="colorItem" data-color="7" style="background: #C23800"></div>
-              <div onclick="change_color(this)" class="colorItem" data-color="9" style="background: #E8A200"></div>
-              <div onclick="change_color(this)" class="colorItem" data-color="11" style="background: #005510"></div>
-              <div onclick="change_color(this)" class="colorItem" data-color="13" style="background: #00569E"></div>
-              <div onclick="change_color(this)" class="colorItem" data-color="15" style="background: #0E0865"></div>
-              <div onclick="change_color(this)" class="colorItem" data-color="17" style="background: #550069"></div>
-              <div onclick="change_color(this)" class="colorItem" data-color="19" style="background: #A75574"></div>
-              <div onclick="change_color(this)" class="colorItem" data-color="21" style="background: #63300D"></div>
-            </div>
-          </div>
-          <input onchange="colorPicker()" type="color" id="colorPicker" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit color">
-          <div class="containerTools">
-            <div onclick="pencil()" class="tool toolActive" data-tool="pen"><img class="toolIcon" src="images/pen.gif" data-toggle="tooltip" data-placement="top" title="" data-original-title="(P)en"></div>
-            <div onclick="eraser()" class="tool" data-tool="erase"><img class="toolIcon" src="images/rubber.gif" data-toggle="tooltip" data-placement="top" title="" data-original-title="(E)raser"></div>
-            <div onclick="fill_canvas()" class="tool" data-tool="fill"><img class="toolIcon" src="images/filltool.gif" data-toggle="tooltip" data-placement="top" title="" data-original-title="(F)ill"></div>
-          </div>
-          <div class="containerBrushSizes" data-toggle="tooltip" data-placement="top" title="" data-original-title="Set brush size">
-            <input onclick="myRange()" id="myRange" type="range" min="1" max="50" value="6">
-          </div>
-          <div class="containerClearCanvas">
-            <div onclick="clear_canvas()" id="buttonClearCanvas" data-toggle="tooltip" data-placement="top" title="" data-original-title="Clear the board"></div>
-          </div>
-        </div>
-      </main>
 
       <aside>
         <div id="wordsContainer" class="wordsBox">
@@ -109,6 +64,49 @@
             <a class="btn btn-primary" id="backToHome" type="submit" href="/" >Back To Home</a>
           </div>
         </div>
+      </div>
+    </div>
+    <div id= "toolbar" class="containerToolbar toHide">
+      <div class="colorPreview" data-toggle="tooltip" data-placement="top" title="" style="background-color: rgb(0, 0, 0);" data-original-title="Color preview"></div>
+      <div class="containerColorbox" data-toggle="tooltip" data-placement="top" title="" data-original-title="Select a color">
+        <div class="containerColorColumn">
+          <div onclick="change_color(this)" class="colorItem" data-color="0" style="background: #FFF"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="2" style="background: #C1C1C1"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="4" style="background: #EF130B"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="6" style="background: #FF7100"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="8" style="background: #FFE400"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="10" style="background: #00CC00"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="12" style="background: #00B2FF"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="14" style="background: #231FD3"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="16" style="background: #A300BA"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="18" style="background: #D37CAA"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="20" style="background: #A0522D"></div>
+        </div>
+        <div class="containerColorColumn">
+          <div onclick="change_color(this)"class="colorItem" data-color="1" style="background: #000"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="3" style="background: #4C4C4C"></div>
+          <div onclick="change_color(this)"class="colorItem" data-color="5" style="background: #740B07"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="7" style="background: #C23800"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="9" style="background: #E8A200"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="11" style="background: #005510"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="13" style="background: #00569E"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="15" style="background: #0E0865"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="17" style="background: #550069"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="19" style="background: #A75574"></div>
+          <div onclick="change_color(this)" class="colorItem" data-color="21" style="background: #63300D"></div>
+        </div>
+      </div>
+      <input onchange="colorPicker()" type="color" id="colorPicker" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit color">
+      <div class="containerTools">
+        <div onclick="pencil()" class="tool toolActive" data-tool="pen"><img class="toolIcon" src="images/pen.gif" data-toggle="tooltip" data-placement="top" title="" data-original-title="(P)en"></div>
+        <div onclick="eraser()" class="tool" data-tool="erase"><img class="toolIcon" src="images/rubber.gif" data-toggle="tooltip" data-placement="top" title="" data-original-title="(E)raser"></div>
+        <div onclick="fill_canvas()" class="tool" data-tool="fill"><img class="toolIcon" src="images/filltool.gif" data-toggle="tooltip" data-placement="top" title="" data-original-title="(F)ill"></div>
+      </div>
+      <div class="containerBrushSizes" data-toggle="tooltip" data-placement="top" title="" data-original-title="Set brush size">
+        <input onclick="myRange()" id="myRange" type="range" min="1" max="50" value="6">
+      </div>
+      <div class="containerClearCanvas">
+        <div onclick="clear_canvas()" id="buttonClearCanvas" data-toggle="tooltip" data-placement="top" title="" data-original-title="Clear the board"></div>
       </div>
     </div>
   </div>

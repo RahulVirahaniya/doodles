@@ -569,6 +569,7 @@ $(document).ready(function(){
       newColor={r: rgb[0], g: rgb[1], b: rgb[2], a: 0xff};
       // Check if base color and new color are the same
       if (colorMatch(baseColor, newColor)) {
+        console.log("match");
         return;
       }
       floodFill(imageData, newColor, x, y);

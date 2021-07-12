@@ -165,7 +165,7 @@ element.style {
 }
 @media only screen and (max-width: 1024px){
   .boxMessage{
-    max-height: 225px;
+    max-height: 230px;
     display: flex;
     flex-direction: column;
     justify-content: center;
