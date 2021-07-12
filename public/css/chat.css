@@ -2,19 +2,19 @@ aside{
   display: flex;
   justify-content: flex-start;
   width: 340px;
-  min-width: 340px;
-  height: 600px;
+  min-width: 265px;
+  max-height: 600px;
+  min-height: auto;
   background-color: #EEEEEE;
   display: flex;
   flex-direction: column;
   margin-left: 8px;
-  margin-top: 45px;
-  border-radius: 10px;
+  border-radius: 3px;
   padding-bottom: 5px;
   position: relative;
 }
 .boxMessage{
-  max-height:440px;
+  height: auto;
   overflow-y: auto;
   overflow-x: hidden;
   border-radius: 5px;
@@ -47,7 +47,7 @@ aside{
 .wordsBox{
   padding-top: 5px;
   border-radius: 5px;
-  min-height: 170px;
+  height: auto;
   background-color: #deedf0;
   padding-bottom: 5px;
 }
@@ -162,4 +162,20 @@ aside{
 }
 element.style {
     background-color: rgb(0, 0, 0);
+}
+@media only screen and (max-width: 1024px){
+  .boxMessage{
+    max-height: 225px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+@media only screen and (max-width: 700px){
+  .boxMessage{
+    max-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 }

@@ -1,4 +1,4 @@
-var socket=io.connect("https://dooodles.herokuapp.com/");
+var socket=io.connect("http://localhost:3000");
 socket.on('mouse', newDrawing);
 socket.on('mouseup', newFinishedPosition);
 socket.on('fill', newFillCanvas);
@@ -175,7 +175,7 @@ let accessId = '';
 
 socket.on('restrictAccess', data =>{
   const hint = document.getElementById("hint");
-  clearTheBoard();
+  clear_canvas();
   accessId = data.id;
   const toolbar = document.getElementById('toolbar');
   timer.classList.remove('toHide');
@@ -442,7 +442,7 @@ $(document).ready(function(){
   function draw(e){
     if(curUserId != accessId || !painting || fill_mode) return;
     ctx.lineWidth=size;
-    ctx.lineCap="round";
+    ctx.lineJoin=ctx.lineCap="round";
     ctx.strokeStyle=color;
     ctx.lineTo(e.offsetX,e.offsetY);
     ctx.stroke();
@@ -471,6 +471,28 @@ $(document).ready(function(){
   ////////////////////////////////
 
 
+  function getColorAtPixel(imageData, x, y) {
+    const {width, data} = imageData
+
+    return {
+      r: data[4 * (width * y + x) + 0],
+      g: data[4 * (width * y + x) + 1],
+      b: data[4 * (width * y + x) + 2],
+      a: data[4 * (width * y + x) + 3]
+    }
+  }
+
+  function setColorAtPixel(imageData, color, x, y) {
+    const {width, data} = imageData
+
+    data[4 * (width * y + x) + 0] = color.r & 0xff
+    data[4 * (width * y + x) + 1] = color.g & 0xff
+    data[4 * (width * y + x) + 2] = color.b & 0xff
+    data[4 * (width * y + x) + 3] = color.a & 0xff
+  }
+  function colorMatch(m, n) {
+    return m.r == n.r && m.g == n.g && m.b == n.b && m.a == n.a;
+  }
 
   function fill_canvas(){
     pencil_mode=false;
@@ -479,40 +501,14 @@ $(document).ready(function(){
     canvas.addEventListener('mouseover', () => {
       $('canvas').css("cursor","url(/images/fill_graphic.png) 7 38, default");
     });
-    function getColorAtPixel(imageData, x, y) {
-      const {width, data} = imageData
 
-      return {
-        r: data[4 * (width * y + x) + 0],
-        g: data[4 * (width * y + x) + 1],
-        b: data[4 * (width * y + x) + 2],
-        a: data[4 * (width * y + x) + 3]
-      }
-    }
-
-    function setColorAtPixel(imageData, color, x, y) {
-      const {width, data} = imageData
-
-      data[4 * (width * y + x) + 0] = color.r & 0xff
-      data[4 * (width * y + x) + 1] = color.g & 0xff
-      data[4 * (width * y + x) + 2] = color.b & 0xff
-      data[4 * (width * y + x) + 3] = color.a & 0xff
-    }
-
-    function colorMatch(m, n) {
-      return m.r == n.r && m.g == n.g && m.b == n.b && m.a == n.a;
-    }
     function floodFill(imageData, newColor, x, y) {
-      if(pencil_mode===true || eraser_mode===true) return
+      if(pencil_mode === true || eraser_mode === true) return
       const {width, height, data} = imageData
       const stack = []
-      const baseColor = getColorAtPixel(imageData, x, y)
+      const baseColor = getColorAtPixel(imageData, x, y);
       let operator = {x, y}
 
-      // Check if base color and new color are the same
-      if (colorMatch(baseColor, newColor)) {
-        return
-      }
       // Add the clicked location to stack
       stack.push({x: operator.x, y: operator.y})
 
@@ -558,18 +554,24 @@ $(document).ready(function(){
         }
       }
     }
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    let col;
+
     canvas.addEventListener('click', event => {
-      if(pencil_mode || eraser_mode || curUserId !== accessId) return;
-      clear_canvas();
+      if(curUserId !== accessId) return;
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      let newColor;
       const rect = canvas.getBoundingClientRect()
       const x = Math.round(event.clientX - rect.left)
       const y = Math.round(event.clientY - rect.top)
+      
+      const baseColor = getColorAtPixel(imageData, x, y);
       let rgb=colorPreview.style.backgroundColor
       rgb=rgb.substring(4, rgb.length-1).replace(/ /g, '').split(',');
-      col={r: rgb[0], g: rgb[1], b: rgb[2], a: 0xff};
-      floodFill(imageData, col, x, y);
+      newColor={r: rgb[0], g: rgb[1], b: rgb[2], a: 0xff};
+      // Check if base color and new color are the same
+      if (colorMatch(baseColor, newColor)) {
+        return;
+      }
+      floodFill(imageData, newColor, x, y);
       ctx.putImageData(imageData, 0, 0);
       let img=canvas.toDataURL();
       socket.emit('fill', img);
@@ -583,14 +585,13 @@ $(document).ready(function(){
     myImage.src = img;
   }
   function clear_canvas(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    if(fill_mode){
-      fill_canvas();
-    }
+    ctx.fillStyle = "#FFF";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     socket.emit('clear');
   }
   function clearTheBoard(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = "#FFF";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
   canvas.addEventListener("touchstart",startPosition);
   canvas.addEventListener("mousedown",startPosition);

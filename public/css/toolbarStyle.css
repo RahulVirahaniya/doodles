@@ -4,9 +4,10 @@
 .containerToolbar{
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  margin-left: 245px;
   margin-top: 10px;
   user-select: none;
+  width: auto;
 }
 .colorPreview {
     flex: 0 0 auto;
@@ -114,4 +115,11 @@ img {
     pointer-events: none;
     disabled : true;
     /* opacity: 0.4; */
+}
+@media only screen and (max-width: 1024px){
+  .containerToolbar{
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center;
+  }
 }
