@@ -1,4 +1,4 @@
-var socket=io.connect("https://dooodles.herokuapp.com/");
+var socket=io.connect("http://localhost:3000");
 socket.on('mouse', newDrawing);
 socket.on('mouseup', newFinishedPosition);
 socket.on('fill', newFillCanvas);
@@ -442,8 +442,8 @@ $(document).ready(function(){
   function getMousePos(canvas, e){
     const rect = canvas.getBoundingClientRect();
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
+      x: Math.round(e.clientX - rect.left),
+      y: Math.round(e.clientY - rect.top)
     };
   }
   function draw(e){
@@ -563,18 +563,17 @@ $(document).ready(function(){
       }
     }
 
-    canvas.addEventListener('click', event => {
+    canvas.addEventListener('click', e => {
       if(curUserId !== accessId) return;
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       let newColor;
-      let mousePos = getMousePos(canvas, event);
+      let mousePos = getMousePos(canvas, e);
       const baseColor = getColorAtPixel(imageData, mousePos.x, mousePos.y);
       let rgb=colorPreview.style.backgroundColor
       rgb=rgb.substring(4, rgb.length-1).replace(/ /g, '').split(',');
       newColor={r: rgb[0], g: rgb[1], b: rgb[2], a: 0xff};
       // Check if base color and new color are the same
       if (colorMatch(baseColor, newColor)) {
-        console.log("match");
         return;
       }
       floodFill(imageData, newColor, mousePos.x, mousePos.y);
