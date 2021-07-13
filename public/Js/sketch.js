@@ -189,13 +189,12 @@ socket.on('restrictAccess', data =>{
     append("You", " are Drawing Now!", 'right', 'blue');
     $("#votekickCurrentplayer").prop('disabled', true);
     $(".tooltip-wrapper").addClass("disabled");
-    scrollToBottom();
   } else {
     append(data.activeUsername, " is Drawing Now!", 'left', 'blue');
     $("#votekickCurrentplayer").prop('disabled', false);
     $(".tooltip-wrapper").removeClass("disabled");
-    scrollToBottom();
   }
+  scrollToBottom();
   wordSelectAndHint.style.display='block';
 });
 
@@ -215,6 +214,7 @@ socket.on('voteKickMessage', data =>{
   } else {
     append('You', ` have voted to kick '${data.currDrawer}' (${data.voteKickCount}/${data.userLength})`, 'right', 'yellow')
   }
+  scrollToBottom();
 });
 
 socket.on('voteKickCurrentPlayer', data => {
