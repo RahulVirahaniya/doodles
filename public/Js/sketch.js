@@ -358,10 +358,10 @@ socket.on('gameFinished', (data) =>{
   }
   popUp.classList.remove('toHide');
   popUp.style.display = "flex";
-  setTimeout(() => {
-    socket.disconnect();
-    window.location.href = window.location.href;
-  }, 5000);
+  // setTimeout(() => {
+  //   socket.disconnect();
+  //   window.location.href = window.location.href;
+  // }, 5000);
 });
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
