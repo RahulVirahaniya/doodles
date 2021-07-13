@@ -1,6 +1,6 @@
 body {
     width:100%;
-    height:100vh;
+    height: 100vh;
     overflow: auto;
     background-color: #aa3333;
     background-color: #ff7700;
@@ -37,15 +37,10 @@ input[name='enteredName'] {
     padding: 30px;
 }
 
-.enter-form-container form {
-    padding: 10px;
-    width: 400px;
-}
-
 
 .enter-form-element {
-    padding: 14px;
-    width:100%;
+    padding: 14px 0px !important;
+    width: 400px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -67,3 +62,16 @@ input[name='enteredName'] {
 #playBtn{
     width: 120px;
 }
+@media only screen and (max-width: 700px){
+    body{
+        height: auto;
+    }
+    .enter-form-element{
+        width: 300px;
+    }
+}
+@media only screen and (max-width: 1400px) {
+    body {
+        justify-content: center;
+    }
+  }

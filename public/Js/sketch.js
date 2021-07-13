@@ -1,4 +1,4 @@
-var socket=io.connect("https://dooodles.herokuapp.com/");
+var socket=io.connect("http://localhost:3000");
 socket.on('mouse', newDrawing);
 socket.on('mouseup', newFinishedPosition);
 socket.on('fill', newFillCanvas);
@@ -438,23 +438,30 @@ $(document).ready(function(){
   }
 
   ////////////// editing here
-
+  function getMousePos(canvas, e){
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+  }
   function draw(e){
     if(curUserId != accessId || !painting || fill_mode) return;
+    let mousePos = getMousePos(canvas, e);
     ctx.lineWidth=size;
     ctx.lineJoin=ctx.lineCap="round";
     ctx.strokeStyle=color;
-    ctx.lineTo(e.offsetX,e.offsetY);
+    ctx.lineTo(mousePos.x,mousePos.y);
     ctx.stroke();
     ctx.beginPath();
     let data = {
-      x: e.offsetX,
-      y: e.offsetY,
+      x: mousePos.x,
+      y: mousePos.y,
       size: size,
       color: color
     }
     socket.emit('mouse', data);
-    ctx.moveTo(e.offsetX,e.offsetY);
+    ctx.moveTo(mousePos.x,mousePos.y);
   }
 
   function newDrawing(data){
@@ -559,11 +566,8 @@ $(document).ready(function(){
       if(curUserId !== accessId) return;
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       let newColor;
-      const rect = canvas.getBoundingClientRect()
-      const x = Math.round(event.clientX - rect.left)
-      const y = Math.round(event.clientY - rect.top)
-      
-      const baseColor = getColorAtPixel(imageData, x, y);
+      let mousePos = getMousePos(canvas, event);
+      const baseColor = getColorAtPixel(imageData, mousePos.x, mousePos.y);
       let rgb=colorPreview.style.backgroundColor
       rgb=rgb.substring(4, rgb.length-1).replace(/ /g, '').split(',');
       newColor={r: rgb[0], g: rgb[1], b: rgb[2], a: 0xff};
@@ -572,7 +576,7 @@ $(document).ready(function(){
         console.log("match");
         return;
       }
-      floodFill(imageData, newColor, x, y);
+      floodFill(imageData, newColor, mousePos.x, mousePos.y);
       ctx.putImageData(imageData, 0, 0);
       let img=canvas.toDataURL();
       socket.emit('fill', img);
