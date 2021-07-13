@@ -26,6 +26,7 @@ body{
   display: flex;
   flex-direction: row;
   margin-top: 10px;
+  margin-bottom: 10px;
 }
 .containerCanvas{
   display: flex;
@@ -55,8 +56,9 @@ body{
   }
 }
 @media only screen and (orientation:landscape) and (max-width: 700px){
-  body {  
+  html {  
     width: fit-content;
+    height: 500px;
      -webkit-transform: rotate(0deg);
      -moz-transform: rotate(0deg);
      -o-transform: rotate(0deg);
