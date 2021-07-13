@@ -37,9 +37,6 @@ const append= (name, message, mode, type) =>{
     messageElement.classList.add(type);
   }
   boxMessage.append(messageElement);
-  // if(mode==="left"){
-  //   audio.play();
-  // }
 }
 
 // bringing in id
@@ -379,17 +376,9 @@ $(document).ready(function(){
   }
   function myRange(){
     size=document.getElementById("myRange").value;
+    console.log(size);
     if(pencil_mode){
       pencil();
-    }
-  }
-  function colorPicker(){
-    colorPreview.style.backgroundColor=document.getElementById("colorPicker").value;
-    if(eraser_mode==false){
-      color=document.getElementById("colorPicker").value;
-      if(fill_mode===false){
-        pencil();
-      }
     }
   }
   function change_color(element){
@@ -426,10 +415,12 @@ $(document).ready(function(){
     });
   }
   function startPosition(e){
+      e.preventDefault();
       painting=true;
       draw(e);
   }
-  function finishedPosition(){
+  function finishedPosition(e){
+    e.preventDefault();
     painting=false;
     ctx.beginPath();
     socket.emit('mouseup');
@@ -440,19 +431,35 @@ $(document).ready(function(){
 
   ////////////// editing here
   function getMousePos(canvas, e){
-    const rect = canvas.getBoundingClientRect();
+    let x, y;
+    if(e.touches === undefined){
+      x = e.clientX;
+      y = e.clientY;
+    } else {
+      let touch = e.touches[0];
+      x = touch.pageX;
+      y = touch.pageY;
+    }
+    var o = canvas.getBoundingClientRect()
+          , r = canvas.width
+          , s = canvas.height
+          , i = o.width
+          , a = o.height
+          , c = (x - o.left) / i
+          , u = (y - o.top) / a;
     return {
-      x: Math.round(e.clientX - rect.left),
-      y: Math.round(e.clientY - rect.top)
+      x: Math.floor(c * r),
+      y: Math.floor(u * s)
     };
   }
   function draw(e){
+    e.preventDefault();
     if(curUserId != accessId || !painting || fill_mode) return;
     let mousePos = getMousePos(canvas, e);
     ctx.lineWidth=size;
     ctx.lineJoin=ctx.lineCap="round";
     ctx.strokeStyle=color;
-    ctx.lineTo(mousePos.x,mousePos.y);
+    ctx.lineTo(mousePos.x, mousePos.y);
     ctx.stroke();
     ctx.beginPath();
     let data = {
@@ -462,9 +469,8 @@ $(document).ready(function(){
       color: color
     }
     socket.emit('mouse', data);
-    ctx.moveTo(mousePos.x,mousePos.y);
+    ctx.moveTo(mousePos.x, mousePos.y);
   }
-
   function newDrawing(data){
       ctx.lineWidth=data.size;
       ctx.lineCap="round";
@@ -562,8 +568,7 @@ $(document).ready(function(){
         }
       }
     }
-
-    canvas.addEventListener('click', e => {
+    function handler(e){
       if(curUserId !== accessId) return;
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       let newColor;
@@ -574,13 +579,16 @@ $(document).ready(function(){
       newColor={r: rgb[0], g: rgb[1], b: rgb[2], a: 0xff};
       // Check if base color and new color are the same
       if (colorMatch(baseColor, newColor)) {
+        console.log("match");
         return;
       }
       floodFill(imageData, newColor, mousePos.x, mousePos.y);
       ctx.putImageData(imageData, 0, 0);
       let img=canvas.toDataURL();
       socket.emit('fill', img);
-    });
+    }
+    canvas.addEventListener('click', handler, false);
+    canvas.addEventListener('touchstart', handler, false);
   }
   function newFillCanvas(img){
     var myImage = new Image();
@@ -598,15 +606,17 @@ $(document).ready(function(){
     ctx.fillStyle = "#FFF";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
-  canvas.addEventListener("touchstart",startPosition);
-  canvas.addEventListener("mousedown",startPosition);
 
-  canvas.addEventListener("touchend",finishedPosition);
-  canvas.addEventListener("mouseup",finishedPosition);
-  canvas.addEventListener('mouseout',finishedPosition);
+  canvas.addEventListener("touchstart", startPosition);
+  canvas.addEventListener("mousedown", startPosition);
 
-  canvas.addEventListener("touchmove",draw);
-  canvas.addEventListener("mousemove",draw);
+  canvas.addEventListener("touchcancel", finishedPosition);
+  canvas.addEventListener("touchend", finishedPosition);
+  canvas.addEventListener("mouseup", finishedPosition);
+  canvas.addEventListener('mouseout', finishedPosition);
+
+  canvas.addEventListener("touchmove", draw);
+  canvas.addEventListener("mousemove", draw);
 
   // disconnect on refresh of user
 

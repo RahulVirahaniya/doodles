@@ -18,9 +18,6 @@
 </head>
 
 <body>
-  <!-- /////////// pop up /////////////////////// -->
-
-  <!-- /////////////////////////////////////////////////////////////////////////////////////////////// -->
   <div class="container-fluid">
     <div id="doodlesName">Doodles</div>
     <div class="screenGame">
@@ -100,23 +97,19 @@
           <div onclick="change_color(this)" class="colorItem" data-color="21" style="background: #63300D"></div>
         </div>
       </div>
-      <input onchange="colorPicker()" type="color" id="colorPicker" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit color">
       <div class="containerTools">
         <div onclick="pencil()" class="tool toolActive" data-tool="pen"><img class="toolIcon" src="images/pen.gif" data-toggle="tooltip" data-placement="top" title="" data-original-title="(P)en"></div>
         <div onclick="eraser()" class="tool" data-tool="erase"><img class="toolIcon" src="images/rubber.gif" data-toggle="tooltip" data-placement="top" title="" data-original-title="(E)raser"></div>
         <div onclick="fill_canvas()" class="tool" data-tool="fill"><img class="toolIcon" src="images/filltool.gif" data-toggle="tooltip" data-placement="top" title="" data-original-title="(F)ill"></div>
       </div>
       <div class="containerBrushSizes" data-toggle="tooltip" data-placement="top" title="" data-original-title="Set brush size">
-        <input onclick="myRange()" id="myRange" type="range" min="1" max="50" value="6">
+        <input onclick="myRange()" ontouchend="myRange()" id="myRange" type="range" min="1" max="50" value="6">
       </div>
       <div class="containerClearCanvas">
         <div onclick="clear_canvas()" id="buttonClearCanvas" data-toggle="tooltip" data-placement="top" title="" data-original-title="Clear the board"></div>
       </div>
     </div>
   </div>
-
-
-
 
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
