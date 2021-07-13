@@ -253,6 +253,7 @@ socket.on('autoChosenWord', data=> {
 socket.on('correctAnswer', data =>{
   if(curUserId != accessId){
     append("The word was ",`'${data}'`, 'left', 'green');
+    scrollToBottom();
   }
 });
 
