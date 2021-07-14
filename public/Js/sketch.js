@@ -437,8 +437,8 @@ $(document).ready(function(){
       y = e.clientY;
     } else {
       let touch = e.touches[0];
-      x = touch.pageX;
-      y = touch.pageY;
+      x = touch.clientX;
+      y = touch.clientY;
     }
     var o = canvas.getBoundingClientRect()
           , r = canvas.width
