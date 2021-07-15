@@ -1,4 +1,4 @@
-var socket=io.connect("https://dooodles.herokuapp.com/");
+var socket=io.connect("localhost:3000");
 socket.on('mouse', newDrawing);
 socket.on('mouseup', newFinishedPosition);
 socket.on('fill', newFillCanvas);

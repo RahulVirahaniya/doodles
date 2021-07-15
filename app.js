@@ -123,8 +123,7 @@ io.on('connection', socket =>{
                 clearInterval(x);
                 timerOthers="Time Over!";
                 timerData="Time Over!";
-                hint1 = -1;
-                hint2 = -1;
+                hint1=hint2=hint3=-1;
               } else if(seconds>80 && !wordSelectedTillNow) {
                 timerOthers=users[curActiveUser]+" is choosing a word!";
                 timerData="Choose A Word in "+(seconds-80)+" sec";
